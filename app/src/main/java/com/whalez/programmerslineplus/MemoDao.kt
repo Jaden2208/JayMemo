@@ -2,6 +2,7 @@ package com.whalez.programmerslineplus
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.whalez.programmerslineplus.data.Memo
 
 @Dao
 interface MemoDao {
@@ -16,8 +17,8 @@ interface MemoDao {
     suspend fun delete(memo: Memo)
 
     @Query("select * from Memo")
-    fun getAllMemo(): LiveData<List<Memo>>
+    fun getAllMemos(): LiveData<List<Memo>>
 
     @Query("delete from Memo")
-    fun deleteAllMemo()
+    fun deleteAllMemos()
 }
