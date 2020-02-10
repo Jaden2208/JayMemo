@@ -18,14 +18,14 @@ class MemoViewModel(application: Application): AndroidViewModel(application) {
         MemoDatabase::class.java, "memo-db"
     ).build()
 
-    var allMemos: LiveData<List<Memo>>
+//    var allMemos: LiveData<List<Memo>>
 
     var newTitle: String? = null
     var newContent: String? = null
 
-    init {
-        allMemos = getAll()
-    }
+//    init {
+//        allMemos = getAll()
+//    }
 
     fun insert(title: String, content: String) {
         Log.d("kkk", "insert: ${title}, ${content}")
@@ -50,14 +50,9 @@ class MemoViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
-    fun delete(title: String, content: String) {
+    fun delete(memo: Memo) {
         viewModelScope.launch(Dispatchers.IO) {
-            db.memoDao().delete(
-                Memo(
-                    title,
-                    content
-                )
-            )
+            db.memoDao().delete(memo)
         }
     }
 

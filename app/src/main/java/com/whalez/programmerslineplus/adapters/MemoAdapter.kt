@@ -39,6 +39,10 @@ class MemoAdapter: RecyclerView.Adapter<MemoAdapter.MemoHolder>() {
         notifyDataSetChanged()
     }
 
+    fun getMemoAt(position: Int): Memo {
+        return memos[position]
+    }
+
     class MemoHolder(
         private val binding: MemoItemBinding
     ): RecyclerView.ViewHolder(binding.root){

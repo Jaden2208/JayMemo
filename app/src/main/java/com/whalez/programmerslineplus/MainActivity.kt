@@ -5,16 +5,22 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.whalez.programmerslineplus.adapters.MemoAdapter
 import com.whalez.programmerslineplus.data.Memo
 import com.whalez.programmerslineplus.databinding.ActivityMainBinding
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,71 +34,67 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        // get the view model
-//        memoViewModel = ViewModelProviders.of(this)[MemoViewModel::class.java]
-//
-//        // Specify layout for recycler view
-//        val linearLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-//        rv_main.layoutManager = linearLayoutManager
-//
-//        // Observe the model
-//        memoViewModel.allMemos.observe(this, Observer {
-//            // Data bind the recycler view
-//            rv_main.adapter = MemoAdapter()
-//        })
-
         rv_main.layoutManager = LinearLayoutManager(this)
         rv_main.setHasFixedSize(true)
 
         val memoAdapter = MemoAdapter()
         rv_main.adapter = memoAdapter
 
-        memoViewModel = ViewModelProviders.of(this).get(MemoViewModel::class.java)
-        memoViewModel.getAll().observe(this, object: Observer<List<Memo>> {
-            override fun onChanged(memos: List<Memo>) {
-                memoAdapter.setMemos(memos)
-            }
+        memoViewModel = ViewModelProviders.of(this)[MemoViewModel::class.java]
+        memoViewModel.getAll().observe(this,
+            Observer<List<Memo>> { memos -> memoAdapter.setMemos(memos) })
 
-        })
-
+        // 메모 추가
         btn_add.setOnClickListener {
             val intent = Intent(this, AddMemoActivity::class.java)
-            startActivity(intent)
-//            startActivityForResult(intent, ADD_NOTE_REQUEST)
+            startActivityForResult(intent, ADD_NOTE_REQUEST)
         }
 
+        ItemTouchHelper(object: ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val builder = AlertDialog.Builder(
+                    ContextThemeWrapper(
+                        this@MainActivity,
+                        R.style.MyAlertDialogStyle
+                    )
+                )
+                builder.setMessage("정말 삭제하시겠습니까?")
+                    .setPositiveButton("예") { _, _ ->
+                        memoViewModel.delete(memoAdapter.getMemoAt(viewHolder.adapterPosition))
+                        Toast.makeText(this@MainActivity, "삭제 완료", Toast.LENGTH_SHORT).show()
+                    }
+                    .setNegativeButton("아니요") {_, _ ->
+                        memoAdapter.notifyDataSetChanged()
+                    }
+                    .show()
+            }
+        }).attachToRecyclerView(rv_main)
+
+
     }
 
-    override fun onPause() {
-        super.onPause()
-        Log.d("kkk", "onPause")
-    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data!!)
 
-    override fun onResume() {
-        super.onResume()
-        Log.d("kkk", "onResume")
-    }
+        if(requestCode == ADD_NOTE_REQUEST && resultCode == RESULT_OK) {
+            val title = data.getStringExtra(AddMemoActivity.EXTRA_TITLE)
+            val content = data.getStringExtra(AddMemoActivity.EXTRA_CONTENT)
 
-    override fun onRestart() {
-        super.onRestart()
-        Log.d("kkk", "onRestart")
-    }
+            // 쿼리문 비동기 처리
+            lifecycleScope.launch(Dispatchers.IO) {
+                memoViewModel.insert(title!!, content!!)
+            }
 
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data!!)
-//
-//        if(requestCode == ADD_NOTE_REQUEST && resultCode == RESULT_OK) {
-//            onRestart()
-////            val title: String = data.getStringExtra(AddMemoActivity.EXTRA_TITLE)
-////            val content: String = data.getStringExtra(AddMemoActivity.EXTRA_CONTENT)
-////
-////            val memo = Memo(title, content)
-////            val memoViewModel = ViewModelProviders.of(this)[MemoViewModel::class.java]
-////            binding.
-////            memoViewModel.insert(memo)
-////
-////            Toast.makeText(this, "메모 저장완료", Toast.LENGTH_SHORT).show()
-//        }
-//    }
+            Toast.makeText(this, "메모 저장완료", Toast.LENGTH_SHORT).show()
+        }
+    }
 
 }
