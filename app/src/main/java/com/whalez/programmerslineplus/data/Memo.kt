@@ -1,7 +1,5 @@
 package com.whalez.programmerslineplus.data
 
-import android.view.View
-import android.widget.Toast
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
