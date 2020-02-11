@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".AddMemoActivity">
+    tools:context=".EditMemoActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -26,6 +26,7 @@
                 android:src="@drawable/ic_left_back" />
 
             <TextView
+                android:id="@+id/tv_bar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
@@ -35,7 +36,18 @@
                 android:text="새 메모"
                 android:textColor="#fff"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
+
+            <ImageButton
+                android:id="@+id/btn_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:background="@android:color/transparent"
+                android:layout_margin="5dp"
+                android:paddingEnd="10dp"
+                android:src="@drawable/ic_edit"
+                android:visibility="gone"/>
 
         </RelativeLayout>
 
@@ -50,7 +62,7 @@
             android:id="@+id/et_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rectangle_primary"
+            android:background="@android:color/transparent"
             android:ems="10"
             android:importantForAutofill="no"
             android:padding="3dp"
@@ -58,15 +70,22 @@
             android:textSize="22sp"
             android:textStyle="bold" />
 
+        <View
+            android:id="@+id/line1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#A0A0A0"
+            android:layout_below="@+id/et_title"/>
+
         <EditText
             android:id="@+id/et_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@android:color/transparent"
             android:layout_above="@+id/btn_save"
-            android:layout_below="@id/et_title"
+            android:layout_below="@id/line1"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:background="@drawable/rectangle_primary"
             android:ems="10"
             android:gravity="start"
             android:importantForAutofill="no"

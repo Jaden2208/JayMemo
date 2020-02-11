@@ -27,26 +27,16 @@ class MemoViewModel(application: Application): AndroidViewModel(application) {
 //        allMemos = getAll()
 //    }
 
-    fun insert(title: String, content: String) {
-        Log.d("kkk", "insert: ${title}, ${content}")
+    fun insert(memo: Memo) {
+        Log.d("kkk", "insert: ${memo.title}, ${memo.content}")
         viewModelScope.launch(Dispatchers.IO) {
-            db.memoDao().insert(
-                Memo(
-                    title,
-                    content
-                )
-            )
+            db.memoDao().insert(memo)
         }
     }
 
-    fun update(title: String, content: String) {
+    fun update(memo: Memo) {
         viewModelScope.launch(Dispatchers.IO) {
-            db.memoDao().update(
-                Memo(
-                    title,
-                    content
-                )
-            )
+            db.memoDao().update(memo)
         }
     }
 

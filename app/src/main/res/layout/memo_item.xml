@@ -1,61 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <data>
-        <variable
-            name="memoItem"
-            type="com.whalez.programmerslineplus.data.Memo" />
-    </data>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="8dp">
 
-    <androidx.cardview.widget.CardView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp">
+        android:padding="8dp">
 
-        <RelativeLayout
+        <ImageView
+            android:id="@+id/iv_thumbnail"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_image" />
+
+        <TextView
+            android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:onClick="@{memoItem::onClickListener}">
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/iv_thumbnail"
+            android:text="제목"
+            android:textColor="#000"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/iv_thumbnail"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_alignParentStart="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/default_image" />
-
-            <TextView
-                android:id="@+id/tv_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="10dp"
-                android:layout_toEndOf="@id/iv_thumbnail"
-                android:text="@{memoItem.title}"
-                android:textColor="#000"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_title"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_toEndOf="@id/iv_thumbnail"
-                android:text="@{memoItem.content}"
-                android:textColor="#000"
-                android:textSize="15sp"
-                android:maxLines="1"/>
+        <TextView
+            android:id="@+id/tv_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_title"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@id/iv_thumbnail"
+            android:maxLines="1"
+            android:text="내욘내용내용"
+            android:textColor="#000"
+            android:textSize="15sp" />
 
 
-        </RelativeLayout>
+    </RelativeLayout>
 
-    </androidx.cardview.widget.CardView>
-</layout>
+</androidx.cardview.widget.CardView>
