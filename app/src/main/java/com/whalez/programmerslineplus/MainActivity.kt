@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.skydoves.powermenu.kotlin.powerMenu
 import com.whalez.programmerslineplus.adapters.MemoAdapter
 import com.whalez.programmerslineplus.data.Memo
 import com.whalez.programmerslineplus.databinding.ActivityMainBinding
@@ -29,6 +30,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var memoViewModel: MemoViewModel
+    private val mainMenu by powerMenu(MenuFactory::class)
+
+    private val DELETE_ALL = 0
+    private val APP_INFO = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +53,23 @@ class MainActivity : AppCompatActivity() {
         btn_add.setOnClickListener {
             val intent = Intent(this, AddMemoActivity::class.java)
             startActivityForResult(intent, ADD_NOTE_REQUEST)
+        }
+
+        btn_menu.setOnClickListener { mainMenu.showAsDropDown(it) }
+        mainMenu.setOnMenuItemClickListener { position, item ->
+            when (position) {
+                DELETE_ALL -> {
+                    // 쿼리문 비동기 처리
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        memoViewModel.deleteAll()
+                    }
+                    Toast.makeText(this, "모두 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+                APP_INFO -> {
+                    Toast.makeText(this, item.title, Toast.LENGTH_SHORT).show()
+                }
+
+            }
         }
 
         ItemTouchHelper(object: ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {

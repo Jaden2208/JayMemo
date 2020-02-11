@@ -56,5 +56,8 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 
+    // PowerMenu
+    implementation "com.github.skydoves:powermenu:2.1.2"
+
 
 }
