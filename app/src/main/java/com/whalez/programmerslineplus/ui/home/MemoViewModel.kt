@@ -1,4 +1,4 @@
-package com.whalez.programmerslineplus
+package com.whalez.programmerslineplus.ui.home
 
 import android.app.Application
 import android.util.Log
@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 
 import androidx.room.Room
 import com.whalez.programmerslineplus.data.Memo
+import com.whalez.programmerslineplus.room.MemoDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -18,17 +19,7 @@ class MemoViewModel(application: Application): AndroidViewModel(application) {
         MemoDatabase::class.java, "memo-db"
     ).build()
 
-//    var allMemos: LiveData<List<Memo>>
-
-    var newTitle: String? = null
-    var newContent: String? = null
-
-//    init {
-//        allMemos = getAll()
-//    }
-
     fun insert(memo: Memo) {
-        Log.d("kkk", "insert: ${memo.title}, ${memo.content}")
         viewModelScope.launch(Dispatchers.IO) {
             db.memoDao().insert(memo)
         }
@@ -51,7 +42,9 @@ class MemoViewModel(application: Application): AndroidViewModel(application) {
     }
 
     fun deleteAll() {
-        return db.memoDao().deleteAllMemos()
+        viewModelScope.launch(Dispatchers.IO) {
+            db.memoDao().deleteAllMemos()
+        }
     }
 
 

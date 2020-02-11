@@ -1,22 +1,21 @@
-package com.whalez.programmerslineplus
+package com.whalez.programmerslineplus.ui.edit
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import com.whalez.programmerslineplus.IntentOptions.Companion.EXTRA_CONTENT
-import com.whalez.programmerslineplus.IntentOptions.Companion.EXTRA_ID
-import com.whalez.programmerslineplus.IntentOptions.Companion.EXTRA_TITLE
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
+import com.whalez.programmerslineplus.R
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.ADD_MODE
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.VIEW_MODE
 import kotlinx.android.synthetic.main.activity_edit_memo.*
 
 class EditMemoActivity : AppCompatActivity() {
 
-    private val ADD_MODE = 0
-    private val VIEW_MODE = 1
-    private val EDIT_MODE = 2
-
-    private var MODE = ADD_MODE
+    private var mode = ADD_MODE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,15 +24,16 @@ class EditMemoActivity : AppCompatActivity() {
         val intent = intent
         // 아이템을 눌러서 들어온 경우 보기 모드로 변경
         if(intent.hasExtra(EXTRA_ID)){
-            MODE = VIEW_MODE
+            mode = VIEW_MODE
             setViewMode(intent)
         }
 
-        // 보기 모드에서 수정 버튼을 누르면
-        if (MODE == VIEW_MODE) {
+        // 보기 모드에서 수정 버튼 클릭
+        if (mode == VIEW_MODE) {
             btn_edit.setOnClickListener { setEditMode(intent) }
         }
 
+        // 뒤로가기 버튼 클릭
         btn_back.setOnClickListener { finish() }
     }
 
@@ -56,7 +56,6 @@ class EditMemoActivity : AppCompatActivity() {
 
         setResult(RESULT_OK, data)
         finish()
-
     }
 
     private fun setViewMode(intent: Intent) {

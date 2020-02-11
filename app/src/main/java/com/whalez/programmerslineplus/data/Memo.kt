@@ -12,8 +12,4 @@ data class Memo(
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
-
-//    fun onClickListener(view: View) {
-//        Toast.makeText(view.context, "Clicked: $title", Toast.LENGTH_SHORT).show()
-//    }
 }

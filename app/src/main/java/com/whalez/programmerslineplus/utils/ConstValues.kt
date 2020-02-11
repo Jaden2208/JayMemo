@@ -1,6 +1,6 @@
-package com.whalez.programmerslineplus
+package com.whalez.programmerslineplus.utils
 
-class IntentOptions {
+class ConstValues {
 
     companion object {
         const val EXTRA_ID = "EXTRA_ID"
@@ -9,5 +9,8 @@ class IntentOptions {
 
         const val ADD_MEMO_REQUEST = 1
         const val EDIT_MEMO_REQUEST = 2
+
+        const val ADD_MODE = 0
+        const val VIEW_MODE = 1
     }
 }

@@ -1,4 +1,4 @@
-package com.whalez.programmerslineplus
+package com.whalez.programmerslineplus.ui.home.menu
 
 import android.content.Context
 import android.graphics.Color
@@ -10,8 +10,15 @@ import com.skydoves.powermenu.MenuAnimation
 import com.skydoves.powermenu.PowerMenu
 import com.skydoves.powermenu.PowerMenuItem
 import com.skydoves.powermenu.kotlin.createPowerMenu
+import com.whalez.programmerslineplus.R
 
 class MenuFactory: PowerMenu.Factory() {
+
+    companion object { // 메뉴 옵션
+        const val DELETE_ALL = 0
+        const val APP_INFO = 1
+    }
+
     override fun create(context: Context, lifecycle: LifecycleOwner): PowerMenu {
         return createPowerMenu(context) {
             addItem(PowerMenuItem("모두 삭제", false))
@@ -32,7 +39,7 @@ class MenuFactory: PowerMenu.Factory() {
             setSelectedTextColor(Color.WHITE)
             setMenuColor(Color.WHITE)
             setSelectedMenuColorResource(R.color.colorPrimary)
-            setPreferenceName("HamburgerPowerMenu")
+            setPreferenceName("BasicMenu")
 //            setInitializeRule(Lifecycle.Event.ON_CREATE, 0)
         }
     }
