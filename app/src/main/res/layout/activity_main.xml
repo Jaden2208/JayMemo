@@ -62,7 +62,7 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="20dp"
         android:backgroundTint="@color/colorPrimary"
-        android:src="@drawable/ic_add"
+        android:src="@drawable/ic_add_white"
         app:borderWidth="0dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

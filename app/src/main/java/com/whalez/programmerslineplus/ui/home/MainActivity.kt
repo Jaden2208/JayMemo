@@ -1,6 +1,7 @@
 package com.whalez.programmerslineplus.ui.home
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -23,6 +24,7 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.ADD_MEMO_REQUE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EDIT_MEMO_REQUEST
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_THUMBNAIL
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -41,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         rv_main.layoutManager = layoutManager
         rv_main.setHasFixedSize(true)
 
-        val memoAdapter = MemoAdapter()
+        val memoAdapter = MemoAdapter(applicationContext)
         rv_main.adapter = memoAdapter
 
         memoViewModel = ViewModelProvider(this).get(MemoViewModel::class.java)
@@ -117,6 +119,7 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra(EXTRA_ID, memo.id)
                 intent.putExtra(EXTRA_TITLE, memo.title)
                 intent.putExtra(EXTRA_CONTENT, memo.content)
+                intent.putExtra(EXTRA_THUMBNAIL, memo.thumbnailName)
                 startActivityForResult(intent, EDIT_MEMO_REQUEST)
             }
         })
@@ -128,7 +131,8 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == ADD_MEMO_REQUEST && resultCode == RESULT_OK) {
             val title = data!!.getStringExtra(EXTRA_TITLE)
             val content = data.getStringExtra(EXTRA_CONTENT)
-            val memo = Memo(title!!, content!!)
+            val thumbnailName = data.getStringExtra(EXTRA_THUMBNAIL)
+            val memo = Memo(title!!, content!!, thumbnailName!!)
 
             memoViewModel.insert(memo)
 
@@ -142,7 +146,8 @@ class MainActivity : AppCompatActivity() {
 
             val title = data.getStringExtra(EXTRA_TITLE)
             val content = data.getStringExtra(EXTRA_CONTENT)
-            val memo = Memo(title!!, content!!)
+            val thumbnailName = data.getStringExtra(EXTRA_THUMBNAIL)
+            val memo = Memo(title!!, content!!, thumbnailName!!)
             memo.id = id
 
             memoViewModel.update(memo)

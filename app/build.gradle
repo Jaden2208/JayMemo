@@ -57,7 +57,17 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
 
     // PowerMenu
+    // 출처: https://github.com/skydoves/PowerMenu
     implementation "com.github.skydoves:powermenu:2.1.2"
+
+    // Glide
+    // 출처: https://github.com/bumptech/glide
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
+    kapt 'com.github.bumptech.glide:compiler:4.10.0'
+
+    // TedPermission
+    // 출처: https://github.com/ParkSangGwon/TedPermission
+    implementation "gun0912.ted:tedpermission:2.1.0"
 
 
 }
