@@ -10,12 +10,16 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import com.skydoves.powermenu.kotlin.powerMenu
+import com.smarteist.autoimageslider.IndicatorAnimations
+import com.smarteist.autoimageslider.SliderAnimations
 import com.whalez.programmerslineplus.R
 import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.FROM_ALBUM
 import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.FROM_CAMERA
@@ -38,6 +42,7 @@ class EditMemoActivity : AppCompatActivity() {
     private var mode = ADD_MODE
 
     private val imgLoadOptionsMenu by powerMenu(ImageLoadOptionsFactory::class)
+    private val imgSlideradapter = ImageSliderAdapter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +50,7 @@ class EditMemoActivity : AppCompatActivity() {
 
         val intent = intent
         // 아이템을 눌러서 들어온 경우 보기 모드로 변경
-        if(intent.hasExtra(EXTRA_ID)){
+        if (intent.hasExtra(EXTRA_ID)) {
             mode = VIEW_MODE
             setViewMode(intent)
         }
@@ -59,10 +64,11 @@ class EditMemoActivity : AppCompatActivity() {
             callExternalStoragePermission()
         }
 
+
         // 이미지 로드
         btn_add_img.setOnClickListener { imgLoadOptionsMenu.showAsAnchorCenter(it) }
         imgLoadOptionsMenu.setOnMenuItemClickListener { position, item ->
-            when(position) {
+            when (position) {
                 FROM_CAMERA -> {
                     Toast.makeText(this, item.title, Toast.LENGTH_SHORT).show()
                 }
@@ -77,6 +83,15 @@ class EditMemoActivity : AppCompatActivity() {
 
         // 뒤로가기 버튼 클릭
         btn_back.setOnClickListener { finish() }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (data != null && requestCode == FROM_ALBUM) {
+            Glide.with(this@EditMemoActivity)
+                .load(data.data)
+                .into(iv_thumbnail)
+        }
     }
 
     // 저장하기 버튼 클릭
@@ -105,6 +120,7 @@ class EditMemoActivity : AppCompatActivity() {
         setResult(RESULT_OK, data)
         finish()
     }
+
     private fun saveBitmapOnCache(bitmap: Bitmap, imgName: String) {
         // 내부저장소 캐시 경로 받아오기
         val cacheDir = cacheDir
@@ -125,7 +141,7 @@ class EditMemoActivity : AppCompatActivity() {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
             // 스트림 사용후 close
             fileOutputStream.close()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Log.d("kkk", "exception: " + e.message)
         }
     }
@@ -137,15 +153,48 @@ class EditMemoActivity : AppCompatActivity() {
         et_title.isEnabled = false
         et_content.setText(intent.getStringExtra(EXTRA_CONTENT))
         et_content.isEnabled = false
+        btn_save.visibility = View.GONE
+        image_scrollview.visibility = View.GONE
+        cv_imgSlider.visibility = View.VISIBLE
+
+//        var params = cv_imgSlider.layoutParams as RelativeLayout.LayoutParams
+//        params.addRule(RelativeLayout.BELOW, R.id.et_title)
+        val params = et_content.layoutParams as RelativeLayout.LayoutParams
+        params.addRule(RelativeLayout.BELOW, R.id.cv_imgSlider)
+
         val imgName = intent.getStringExtra(EXTRA_THUMBNAIL)
-        if(imgName != null){
-            val img = getBitmapFromCacheDir(imgName)
+        if (imgName != null) {
+            imageSlider.sliderAdapter = imgSlideradapter
+            renewItems(imgName)
+            imageSlider.setIndicatorAnimation(IndicatorAnimations.SLIDE)
+            imageSlider.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION)
+        }
+    }
+
+    private fun setEditMode() {
+        btn_edit.visibility = View.GONE
+        et_title.isEnabled = true
+        et_content.isEnabled = true
+        btn_save.visibility = View.VISIBLE
+        image_scrollview.visibility = View.VISIBLE
+        cv_imgSlider.visibility = View.GONE
+        val params = et_content.layoutParams as RelativeLayout.LayoutParams
+        params.addRule(RelativeLayout.BELOW, R.id.image_scrollview)
+        val imgName = intent.getStringExtra(EXTRA_THUMBNAIL)
+        if (imgName != null) {
+            val imgBitmap = getBitmapFromCacheDir(imgName)
             Glide.with(this@EditMemoActivity)
-                .load(img)
+                .load(imgBitmap)
                 .into(iv_thumbnail)
         }
+    }
 
-        btn_save.visibility = View.GONE
+    private fun renewItems(imgName: String) {
+        val img = getBitmapFromCacheDir(imgName)
+        val sliderItemList = ArrayList<Bitmap>()
+//        imgName을 배열로 받으면 그 배열 길이만큼 반복
+        sliderItemList.add(img)
+        imgSlideradapter.renewItems(sliderItemList)
     }
 
     private fun getBitmapFromCacheDir(imgName: String): Bitmap {
@@ -160,13 +209,6 @@ class EditMemoActivity : AppCompatActivity() {
             }
         }
         return imgBitmap
-    }
-
-    private fun setEditMode() {
-        btn_edit.visibility = View.GONE
-        et_title.isEnabled = true
-        et_content.isEnabled = true
-        btn_save.visibility = View.VISIBLE
     }
 
     private fun callExternalStoragePermission() {
@@ -187,14 +229,6 @@ class EditMemoActivity : AppCompatActivity() {
             .check()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(data != null && requestCode == FROM_ALBUM) {
-            Glide.with(this@EditMemoActivity)
-                .load(data.data)
-                .into(iv_thumbnail)
-        }
-    }
 
     private fun goToAlbum() {
         val intent = Intent(Intent.ACTION_PICK)
@@ -203,7 +237,6 @@ class EditMemoActivity : AppCompatActivity() {
         )
         startActivityForResult(intent, FROM_ALBUM)
     }
-
 
 
 }

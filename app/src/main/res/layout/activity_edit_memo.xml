@@ -36,18 +36,18 @@
                 android:text="새 메모"
                 android:textColor="#fff"
                 android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <ImageButton
                 android:id="@+id/btn_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
-                android:background="@android:color/transparent"
                 android:layout_margin="5dp"
+                android:background="@android:color/transparent"
                 android:paddingEnd="10dp"
                 android:src="@drawable/ic_edit"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
         </RelativeLayout>
 
@@ -70,52 +70,74 @@
             android:textSize="22sp"
             android:textStyle="bold" />
 
-        <View
-            android:id="@+id/line1"
+        <HorizontalScrollView
+            android:id="@+id/image_scrollview"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#A0A0A0"
-            android:layout_below="@+id/et_title"/>
-        <FrameLayout
-            android:id="@+id/fl_image"
-            android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_below="@+id/line1"
+            android:layout_below="@+id/et_title"
             android:background="@drawable/rectangle_primary">
 
-            <ImageView
-                android:id="@+id/iv_thumbnail"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"/>
+                android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/btn_add_img"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_add_gray"
-                android:background="@android:color/transparent"/>
+                <ImageView
+                    android:id="@+id/iv_thumbnail"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop" />
 
-        </FrameLayout>
+                <ImageButton
+                    android:id="@+id/btn_add_img"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_add_gray" />
 
+            </LinearLayout>
 
-        <View
-            android:id="@+id/line2"
+        </HorizontalScrollView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_imgSlider"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#A0A0A0"
-            android:layout_below="@+id/fl_image"/>
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_title"
+            app:cardCornerRadius="6dp"
+            android:visibility="gone">
+
+            <com.smarteist.autoimageslider.SliderView
+                android:id="@+id/imageSlider"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:sliderAnimationDuration="600"
+                app:sliderAutoCycleDirection="back_and_forth"
+                app:sliderAutoCycleEnabled="false"
+                app:sliderCircularHandlerEnabled="true"
+                app:sliderIndicatorAnimationDuration="600"
+                app:sliderIndicatorGravity="center_horizontal|bottom"
+                app:sliderIndicatorMargin="15dp"
+                app:sliderIndicatorOrientation="horizontal"
+                app:sliderIndicatorPadding="3dp"
+                app:sliderIndicatorRadius="2dp"
+                app:sliderIndicatorSelectedColor="#5A5A5A"
+                app:sliderIndicatorUnselectedColor="#FFF"
+                app:sliderScrollTimeInSec="1"
+                app:sliderStartAutoCycle="true" />
+
+        </androidx.cardview.widget.CardView>
 
         <EditText
             android:id="@+id/et_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
             android:layout_above="@+id/btn_save"
-            android:layout_below="@id/line2"
+            android:layout_below="@+id/image_scrollview"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
+            android:background="@android:color/transparent"
             android:ems="10"
             android:gravity="start"
             android:importantForAutofill="no"
