@@ -33,8 +33,8 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
         val currentMemo = getItem(position)
         holder.title.text = currentMemo.title
         holder.content.text = currentMemo.content
-        if (currentMemo.thumbnailName != "none") {
-            val img = getBitmapFromCacheDir(currentMemo.thumbnailName)
+        if (currentMemo.photos[0] != "none") {
+            val img = getBitmapFromCacheDir(currentMemo.photos[0])
             Glide.with(holder.thumbnail.context)
                 .load(img)
                 .into(holder.thumbnail)

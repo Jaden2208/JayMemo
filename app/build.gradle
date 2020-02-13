@@ -73,6 +73,11 @@ dependencies {
     // 출처: https://github.com/smarteist/Android-Image-Slider
     implementation 'com.github.smarteist:autoimageslider:1.3.2-appcompat'
 
+    // StickySwitch
+    // 출처: https://github.com/GwonHyeok/StickySwitch
+    implementation 'com.github.GwonHyeok:StickySwitch:0.0.16'
 
+    // Gson
+    implementation 'com.google.code.gson:gson:2.8.6'
 
 }

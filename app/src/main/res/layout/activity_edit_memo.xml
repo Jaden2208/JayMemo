@@ -25,6 +25,24 @@
                 android:padding="8dp"
                 android:src="@drawable/ic_left_back" />
 
+            <io.ghyeok.stickyswitch.widget.StickySwitch
+                android:id="@+id/switch_add_photo"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/tv_bar_title"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="8dp"
+                app:ss_animationDuration="200"
+                app:ss_iconPadding="7dp"
+                app:ss_iconSize="15dp"
+                app:ss_rightIcon="@drawable/ic_add_img_btn"
+                app:ss_selectedTextSize="0sp"
+                app:ss_sliderBackgroundColor="@color/colorPrimaryDeepDark"
+                app:ss_switchColor="@color/colorPrimaryDark"
+                app:ss_textColor="@color/colorBlack"
+                app:ss_textSize="0sp"
+                app:ss_animationType="line"/>
+
             <TextView
                 android:id="@+id/tv_bar_title"
                 android:layout_width="wrap_content"
@@ -54,6 +72,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <RelativeLayout
+        android:id="@+id/add_img_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp">
@@ -66,57 +85,72 @@
             android:ems="10"
             android:importantForAutofill="no"
             android:padding="3dp"
-            android:textColor="#000"
+            android:textColor="@color/colorPrimaryDeepDark"
             android:textSize="22sp"
             android:textStyle="bold" />
 
+        <View
+            android:id="@+id/line1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#a0a0a0"
+            android:layout_marginTop="8dp"
+            android:layout_below="@+id/et_title"/>
+
         <HorizontalScrollView
             android:id="@+id/image_scrollview"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:layout_below="@+id/et_title"
-            android:background="@drawable/rectangle_primary">
+            android:layout_below="@+id/line1"
+            android:visibility="gone">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/iv_thumbnail"
-                    android:layout_width="100dp"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_photo"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerCrop" />
+                    tools:listitem="@layout/photo_item" />
 
                 <ImageButton
                     android:id="@+id/btn_add_img"
                     android:layout_width="100dp"
                     android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
+                    android:background="@drawable/rectangle_primary"
                     android:src="@drawable/ic_add_gray" />
 
             </LinearLayout>
 
         </HorizontalScrollView>
 
+        <View
+            android:id="@+id/line2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#a0a0a0"
+            android:layout_below="@+id/image_scrollview"/>
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cv_imgSlider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/et_title"
-            app:cardCornerRadius="6dp"
-            android:visibility="gone">
+            android:layout_below="@+id/line2"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:cardCornerRadius="6dp">
 
             <com.smarteist.autoimageslider.SliderView
                 android:id="@+id/imageSlider"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                app:sliderAnimationDuration="600"
+                app:sliderAnimationDuration="200"
                 app:sliderAutoCycleDirection="back_and_forth"
                 app:sliderAutoCycleEnabled="false"
-                app:sliderCircularHandlerEnabled="true"
-                app:sliderIndicatorAnimationDuration="600"
+                app:sliderCircularHandlerEnabled="false"
+                app:sliderIndicatorAnimationDuration="200"
                 app:sliderIndicatorGravity="center_horizontal|bottom"
                 app:sliderIndicatorMargin="15dp"
                 app:sliderIndicatorOrientation="horizontal"
@@ -125,7 +159,7 @@
                 app:sliderIndicatorSelectedColor="#5A5A5A"
                 app:sliderIndicatorUnselectedColor="#FFF"
                 app:sliderScrollTimeInSec="1"
-                app:sliderStartAutoCycle="true" />
+                app:sliderStartAutoCycle="false" />
 
         </androidx.cardview.widget.CardView>
 

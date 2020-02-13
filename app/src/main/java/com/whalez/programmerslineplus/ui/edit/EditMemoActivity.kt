@@ -4,16 +4,18 @@ import android.Manifest
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
@@ -27,22 +29,32 @@ import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.ADD_MODE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
-import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_THUMBNAIL
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.VIEW_MODE
+import io.ghyeok.stickyswitch.widget.StickySwitch
 import kotlinx.android.synthetic.main.activity_edit_memo.*
-import java.io.ByteArrayOutputStream
+import kotlinx.android.synthetic.main.memo_item.*
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class EditMemoActivity : AppCompatActivity() {
 
     private var mode = ADD_MODE
 
+    // Switch Add Photo Options
+    private val on = "RIGHT"
+    private val off = "LEFT"
+
     private val imgLoadOptionsMenu by powerMenu(ImageLoadOptionsFactory::class)
     private val imgSlideradapter = ImageSliderAdapter(this)
+
+    private val photoList = ArrayList<Uri>()
+    private val photoAdapter =
+        PhotoAdapter(photoList)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +75,25 @@ class EditMemoActivity : AppCompatActivity() {
         if (mode != VIEW_MODE) {
             callExternalStoragePermission()
         }
+        switch_add_photo.onSelectedChangeListener = object: StickySwitch.OnSelectedChangeListener {
+            override fun onSelectedChange(direction: StickySwitch.Direction, text: String) {
+                when(direction.name) {
+                    on -> {
+                        image_scrollview.visibility = View.VISIBLE
+                    }
+                    off -> {
+                        image_scrollview.visibility = View.GONE
+                    }
+                }
+            }
+        }
 
+
+        val photoLayoutManager = LinearLayoutManager(applicationContext)
+        photoLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        rv_photo.layoutManager = photoLayoutManager
+        rv_photo.itemAnimator = DefaultItemAnimator()
+        rv_photo.adapter = photoAdapter
 
         // 이미지 로드
         btn_add_img.setOnClickListener { imgLoadOptionsMenu.showAsAnchorCenter(it) }
@@ -88,9 +118,8 @@ class EditMemoActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (data != null && requestCode == FROM_ALBUM) {
-            Glide.with(this@EditMemoActivity)
-                .load(data.data)
-                .into(iv_thumbnail)
+            photoList.add(data.data!!)
+            photoAdapter.notifyDataSetChanged()
         }
     }
 
@@ -103,14 +132,26 @@ class EditMemoActivity : AppCompatActivity() {
             return
         }
         // 비트 맵을 캐시에 저장
-        val bitmap = (iv_thumbnail.drawable as BitmapDrawable).bitmap
-        val imgName = UUID.randomUUID().toString()
-        saveBitmapOnCache(bitmap, imgName)
+        val photoList = photoAdapter.photoList
+        val photoNameList = ArrayList<String>()
+        for (photoUri in photoList) {
+            lateinit var bitmap: Bitmap
+            if (Build.VERSION.SDK_INT < 28) {
+                bitmap = MediaStore.Images.Media
+                    .getBitmap(this.contentResolver, photoUri)
+            } else {
+                val source = ImageDecoder.createSource(this.contentResolver, photoUri)
+                bitmap = ImageDecoder.decodeBitmap(source)
+            }
+            val imgName = UUID.randomUUID().toString()
+            saveBitmapOnCache(bitmap, imgName)
+            photoNameList.add(imgName)
+        }
 
         val data = Intent()
         data.putExtra(EXTRA_TITLE, title)
         data.putExtra(EXTRA_CONTENT, content)
-        data.putExtra(EXTRA_THUMBNAIL, imgName)
+        data.putExtra(EXTRA_PHOTO, photoNameList)
 
         val id = intent.getIntExtra(EXTRA_ID, -1)
         if (id != -1) {
@@ -156,19 +197,16 @@ class EditMemoActivity : AppCompatActivity() {
         btn_save.visibility = View.GONE
         image_scrollview.visibility = View.GONE
         cv_imgSlider.visibility = View.VISIBLE
+        switch_add_photo.visibility = View.GONE
 
-//        var params = cv_imgSlider.layoutParams as RelativeLayout.LayoutParams
-//        params.addRule(RelativeLayout.BELOW, R.id.et_title)
         val params = et_content.layoutParams as RelativeLayout.LayoutParams
         params.addRule(RelativeLayout.BELOW, R.id.cv_imgSlider)
 
-        val imgName = intent.getStringExtra(EXTRA_THUMBNAIL)
-        if (imgName != null) {
-            imageSlider.sliderAdapter = imgSlideradapter
-            renewItems(imgName)
-            imageSlider.setIndicatorAnimation(IndicatorAnimations.SLIDE)
-            imageSlider.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION)
-        }
+        val imgName = intent.getSerializableExtra(EXTRA_PHOTO) as ArrayList<String>
+        imageSlider.sliderAdapter = imgSlideradapter
+        renewItems(imgName)
+        imageSlider.setIndicatorAnimation(IndicatorAnimations.SLIDE)
+        imageSlider.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION)
     }
 
     private fun setEditMode() {
@@ -178,9 +216,10 @@ class EditMemoActivity : AppCompatActivity() {
         btn_save.visibility = View.VISIBLE
         image_scrollview.visibility = View.VISIBLE
         cv_imgSlider.visibility = View.GONE
+        switch_add_photo.visibility = View.VISIBLE
         val params = et_content.layoutParams as RelativeLayout.LayoutParams
         params.addRule(RelativeLayout.BELOW, R.id.image_scrollview)
-        val imgName = intent.getStringExtra(EXTRA_THUMBNAIL)
+        val imgName = intent.getStringExtra(EXTRA_PHOTO)
         if (imgName != null) {
             val imgBitmap = getBitmapFromCacheDir(imgName)
             Glide.with(this@EditMemoActivity)
@@ -189,11 +228,12 @@ class EditMemoActivity : AppCompatActivity() {
         }
     }
 
-    private fun renewItems(imgName: String) {
-        val img = getBitmapFromCacheDir(imgName)
+    private fun renewItems(imgNames: ArrayList<String>) {
         val sliderItemList = ArrayList<Bitmap>()
-//        imgName을 배열로 받으면 그 배열 길이만큼 반복
-        sliderItemList.add(img)
+        for(imgName in imgNames) {
+            val img = getBitmapFromCacheDir(imgName)
+            sliderItemList.add(img)
+        }
         imgSlideradapter.renewItems(sliderItemList)
     }
 

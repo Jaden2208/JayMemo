@@ -1,15 +1,13 @@
 package com.whalez.programmerslineplus.data
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
+import com.whalez.programmerslineplus.TypeConverter
 
 @Entity
 data class Memo(
     var title: String,
     var content: String,
-    @ColumnInfo(defaultValue = "none")
-    var thumbnailName: String
+    var photos: ArrayList<String> = arrayListOf("none")
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0

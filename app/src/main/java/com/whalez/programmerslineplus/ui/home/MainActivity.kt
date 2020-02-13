@@ -1,7 +1,7 @@
 package com.whalez.programmerslineplus.ui.home
 
 import android.content.Intent
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -24,7 +24,7 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.ADD_MEMO_REQUE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EDIT_MEMO_REQUEST
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
-import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_THUMBNAIL
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -100,6 +100,7 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
                 builder.setMessage("정말 삭제하시겠습니까?")
+                    .setCancelable(false)
                     .setPositiveButton("예") { _, _ ->
                         memoViewModel.delete(memoAdapter.getMemoAt(viewHolder.adapterPosition))
                         Toast.makeText(this@MainActivity, "삭제되었습니다.", Toast.LENGTH_SHORT).show()
@@ -119,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra(EXTRA_ID, memo.id)
                 intent.putExtra(EXTRA_TITLE, memo.title)
                 intent.putExtra(EXTRA_CONTENT, memo.content)
-                intent.putExtra(EXTRA_THUMBNAIL, memo.thumbnailName)
+                intent.putExtra(EXTRA_PHOTO, memo.photos)
                 startActivityForResult(intent, EDIT_MEMO_REQUEST)
             }
         })
@@ -131,8 +132,8 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == ADD_MEMO_REQUEST && resultCode == RESULT_OK) {
             val title = data!!.getStringExtra(EXTRA_TITLE)
             val content = data.getStringExtra(EXTRA_CONTENT)
-            val thumbnailName = data.getStringExtra(EXTRA_THUMBNAIL)
-            val memo = Memo(title!!, content!!, thumbnailName!!)
+            val photos = data.getSerializableExtra(EXTRA_PHOTO) as ArrayList<String>
+            val memo = Memo(title!!, content!!, photos)
 
             memoViewModel.insert(memo)
 
@@ -146,8 +147,8 @@ class MainActivity : AppCompatActivity() {
 
             val title = data.getStringExtra(EXTRA_TITLE)
             val content = data.getStringExtra(EXTRA_CONTENT)
-            val thumbnailName = data.getStringExtra(EXTRA_THUMBNAIL)
-            val memo = Memo(title!!, content!!, thumbnailName!!)
+            val photos = data.getSerializableExtra(EXTRA_PHOTO) as ArrayList<String>
+            val memo = Memo(title!!, content!!, photos)
             memo.id = id
 
             memoViewModel.update(memo)
