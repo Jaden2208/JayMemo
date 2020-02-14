@@ -31,7 +31,7 @@ class ImageLoadOptionsFactory: PowerMenu.Factory() {
             setAutoDismiss(true)
             setLifecycleOwner(lifecycle)
             setAnimation(MenuAnimation.SHOW_UP_CENTER)
-            setCircularEffect(CircularEffect.BODY)
+//            setCircularEffect(CircularEffect.BODY)
             setMenuRadius(10f)
             setMenuShadow(10f)
             setTextColorResource(R.color.colorBlack)

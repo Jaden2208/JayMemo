@@ -1,7 +1,6 @@
 package com.whalez.programmerslineplus.ui.home
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -20,13 +19,11 @@ import com.whalez.programmerslineplus.ui.edit.EditMemoActivity
 import com.whalez.programmerslineplus.ui.home.menu.MenuFactory
 import com.whalez.programmerslineplus.ui.home.menu.MenuFactory.Companion.APP_INFO
 import com.whalez.programmerslineplus.ui.home.menu.MenuFactory.Companion.DELETE_ALL
-import com.whalez.programmerslineplus.utils.ConstValues
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.ADD_MEMO_REQUEST
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EDIT_MEMO_REQUEST
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
-import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO_CNT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -133,12 +130,8 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == ADD_MEMO_REQUEST && resultCode == RESULT_OK) {
             val title = data!!.getStringExtra(EXTRA_TITLE)
             val content = data.getStringExtra(EXTRA_CONTENT)
-//            val photoCnt = data.getIntExtra(EXTRA_PHOTO_CNT)
             val photos = data.getSerializableExtra(EXTRA_PHOTO) as ArrayList<String>
-//            var photos = ArrayList<String>()
-//            if(photoCnt > 0) {
-//                photos = data.getSerializableExtra(EXTRA_PHOTO) as ArrayList<String>
-//            }
+
             val memo = Memo(title!!, content!!, photos)
 
             memoViewModel.insert(memo)

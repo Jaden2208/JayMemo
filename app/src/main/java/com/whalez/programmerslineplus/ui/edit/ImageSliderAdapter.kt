@@ -1,23 +1,20 @@
 package com.whalez.programmerslineplus.ui.edit
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import com.bumptech.glide.Glide
-import com.smarteist.autoimageslider.SliderView
 import com.smarteist.autoimageslider.SliderViewAdapter
 import com.whalez.programmerslineplus.R
 import kotlinx.android.synthetic.main.image_slider_layout_item.view.*
 
-
 class ImageSliderAdapter(private val context: Context) :
     SliderViewAdapter<ImageSliderAdapter.SliderAdapterVH>() {
 
-    private var sliderItems = ArrayList<Bitmap>()
+    private var sliderItems = ArrayList<Uri>()
 
     override fun onCreateViewHolder(parent: ViewGroup): SliderAdapterVH {
         val inflate: View = LayoutInflater.from(parent.context)
@@ -39,7 +36,7 @@ class ImageSliderAdapter(private val context: Context) :
         return sliderItems.size
     }
 
-    fun renewItems(sliderItems: ArrayList<Bitmap>) {
+    fun renewItems(sliderItems: ArrayList<Uri>) {
         this.sliderItems = sliderItems
         notifyDataSetChanged()
     }
@@ -49,7 +46,7 @@ class ImageSliderAdapter(private val context: Context) :
         notifyDataSetChanged()
     }
 
-    fun addItem(sliderItem: Bitmap){
+    fun addItem(sliderItem: Uri){
         this.sliderItems.add(sliderItem)
         notifyDataSetChanged()
     }

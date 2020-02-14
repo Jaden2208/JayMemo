@@ -3,6 +3,9 @@ package com.whalez.programmerslineplus.utils
 class ConstValues {
 
     companion object {
+
+        const val TAG = "___"
+
         const val EXTRA_ID = "EXTRA_ID"
         const val EXTRA_TITLE = "EXTRA_TITLE"
         const val EXTRA_CONTENT = "EXTRA_CONTENT"

@@ -26,23 +26,34 @@
                 android:padding="8dp"
                 android:src="@drawable/ic_left_back" />
 
-            <io.ghyeok.stickyswitch.widget.StickySwitch
-                android:id="@+id/switch_add_photo"
-                android:layout_width="55dp"
+<!--            <io.ghyeok.stickyswitch.widget.StickySwitch-->
+<!--                android:id="@+id/switch_add_photo"-->
+<!--                android:layout_width="55dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_toStartOf="@+id/tv_bar_title"-->
+<!--                android:layout_centerVertical="true"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                app:ss_animationDuration="200"-->
+<!--                app:ss_iconPadding="7dp"-->
+<!--                app:ss_iconSize="15dp"-->
+<!--                app:ss_rightIcon="@drawable/ic_add_img_btn"-->
+<!--                app:ss_selectedTextSize="0sp"-->
+<!--                app:ss_sliderBackgroundColor="@color/colorPrimaryDeepDark"-->
+<!--                app:ss_switchColor="@color/colorPrimaryDark"-->
+<!--                app:ss_textColor="@color/colorBlack"-->
+<!--                app:ss_textSize="0sp"-->
+<!--                app:ss_animationType="line"/>-->
+
+            <ImageButton
+                android:id="@+id/btn_add_photo"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toStartOf="@+id/tv_bar_title"
+                android:src="@drawable/ic_add_img_btn"
+                android:background="@android:color/transparent"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="8dp"
-                app:ss_animationDuration="200"
-                app:ss_iconPadding="7dp"
-                app:ss_iconSize="15dp"
-                app:ss_rightIcon="@drawable/ic_add_img_btn"
-                app:ss_selectedTextSize="0sp"
-                app:ss_sliderBackgroundColor="@color/colorPrimaryDeepDark"
-                app:ss_switchColor="@color/colorPrimaryDark"
-                app:ss_textColor="@color/colorBlack"
-                app:ss_textSize="0sp"
-                app:ss_animationType="line"/>
+                android:padding="5dp"
+                android:layout_toStartOf="@+id/tv_bar_title"/>
 
             <TextView
                 android:id="@+id/tv_bar_title"
@@ -98,49 +109,51 @@
             android:layout_marginTop="8dp"
             android:layout_below="@+id/et_title"/>
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/image_scrollview"
+<!--        <androidx.core.widget.NestedScrollView-->
+<!--            android:id="@+id/image_scrollview"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="100dp"-->
+<!--            android:layout_below="@+id/line1"-->
+<!--            android:visibility="gone">-->
+
+<!--            <LinearLayout-->
+<!--                android:descendantFocusability="blocksDescendants"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <androidx.recyclerview.widget.RecyclerView-->
+<!--                    android:id="@+id/rv_photo"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    tools:listitem="@layout/photo_item" />-->
+
+<!--                <ImageButton-->
+<!--                    android:id="@+id/btn_add_img"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:background="@drawable/rectangle_primary"-->
+<!--                    android:src="@drawable/ic_add_gray" />-->
+
+<!--            </LinearLayout>-->
+
+<!--        </androidx.core.widget.NestedScrollView>-->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_photo"
             android:layout_width="wrap_content"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/line1"
-            android:visibility="gone">
+            android:visibility="visible"/>
 
-            <LinearLayout
-                android:descendantFocusability="blocksDescendants"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_photo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    tools:listitem="@layout/photo_item" />
-
-                <ImageButton
-                    android:id="@+id/btn_add_img"
-                    android:layout_width="100dp"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/rectangle_primary"
-                    android:src="@drawable/ic_add_gray" />
-
-            </LinearLayout>
-
-        </androidx.core.widget.NestedScrollView>
-
-        <View
-            android:id="@+id/line2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#a0a0a0"
-            android:layout_below="@+id/image_scrollview"/>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cv_imgSlider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/line2"
+            android:layout_below="@+id/line1"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:visibility="gone"
             app:cardCornerRadius="6dp">
 
@@ -165,12 +178,19 @@
 
         </androidx.cardview.widget.CardView>
 
+        <View
+            android:id="@+id/line2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#a0a0a0"
+            android:layout_below="@+id/rv_photo"/>
+
         <EditText
             android:id="@+id/et_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/btn_save"
-            android:layout_below="@+id/image_scrollview"
+            android:layout_below="@+id/line2"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="@android:color/transparent"
@@ -187,11 +207,23 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@drawable/button_ripple_effect"
-            android:onClick="saveMemo"
             android:text="저장하기"
             android:textColor="#fff"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <FrameLayout
+            android:id="@+id/fl_progressbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#a0a0a0a0"
+            android:visibility="gone">
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/colorPrimaryDark"/>
+        </FrameLayout>
     </RelativeLayout>
 
 </LinearLayout>

@@ -29,7 +29,7 @@ class MenuFactory: PowerMenu.Factory() {
             setAutoDismiss(true)
             setLifecycleOwner(lifecycle)
             setAnimation(MenuAnimation.SHOWUP_TOP_RIGHT)
-            setCircularEffect(CircularEffect.BODY)
+//            setCircularEffect(CircularEffect.BODY)
             setMenuRadius(10f)
             setMenuShadow(10f)
             setTextColorResource(R.color.colorBlack)
