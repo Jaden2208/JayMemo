@@ -35,6 +35,7 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.VIEW_MODE
 import io.ghyeok.stickyswitch.widget.StickySwitch
 import kotlinx.android.synthetic.main.activity_edit_memo.*
 import kotlinx.android.synthetic.main.memo_item.*
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -83,6 +84,8 @@ class EditMemoActivity : AppCompatActivity() {
                     }
                     off -> {
                         image_scrollview.visibility = View.GONE
+                        photoAdapter.photoList.clear()
+                        photoAdapter.notifyDataSetChanged()
                     }
                 }
             }
@@ -217,15 +220,24 @@ class EditMemoActivity : AppCompatActivity() {
         image_scrollview.visibility = View.VISIBLE
         cv_imgSlider.visibility = View.GONE
         switch_add_photo.visibility = View.VISIBLE
-        val params = et_content.layoutParams as RelativeLayout.LayoutParams
+        var params = et_content.layoutParams as RelativeLayout.LayoutParams
         params.addRule(RelativeLayout.BELOW, R.id.image_scrollview)
-        val imgName = intent.getStringExtra(EXTRA_PHOTO)
-        if (imgName != null) {
-            val imgBitmap = getBitmapFromCacheDir(imgName)
-            Glide.with(this@EditMemoActivity)
-                .load(imgBitmap)
-                .into(iv_thumbnail)
+        params = switch_add_photo.layoutParams as RelativeLayout.LayoutParams
+        params.addRule(RelativeLayout.ALIGN_PARENT_END, R.id.rl_appbar)
+
+//        val imgName = intent.getStringExtra(EXTRA_PHOTO)
+        val imgNames = intent.getSerializableExtra(EXTRA_PHOTO) as ArrayList<String>
+        for(imgName in imgNames) {
+            val imgUri = getUriFromCacheDir(imgName)
+            photoList.add(imgUri)
         }
+        photoAdapter.notifyDataSetChanged()
+//        if (imgName != null) {
+//            val imgBitmap = getBitmapFromCacheDir(imgName)
+//            Glide.with(this@EditMemoActivity)
+//                .load(imgBitmap)
+//                .into(iv_thumbnail)
+//        }
     }
 
     private fun renewItems(imgNames: ArrayList<String>) {
@@ -246,9 +258,15 @@ class EditMemoActivity : AppCompatActivity() {
         for (tempFile in files) {
             if (tempFile.name.contains(imgName)) {
                 imgBitmap = BitmapFactory.decodeFile("${file}/${tempFile.name}")
+                break
             }
         }
         return imgBitmap
+    }
+
+    private fun getUriFromCacheDir(imgName: String): Uri {
+        val fileDir = File(cacheDir.toString())
+        return Uri.fromFile(File("${fileDir}/${imgName}.jpg"))
     }
 
     private fun callExternalStoragePermission() {
