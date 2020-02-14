@@ -7,7 +7,7 @@ import com.whalez.programmerslineplus.TypeConverter
 data class Memo(
     var title: String,
     var content: String,
-    var photos: ArrayList<String> = arrayListOf("none")
+    var photos: ArrayList<String>
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0

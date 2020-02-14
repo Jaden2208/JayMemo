@@ -27,9 +27,11 @@ import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.
 import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.FROM_CAMERA
 import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.FROM_URL
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.ADD_MODE
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EDIT_MODE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO_CNT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.VIEW_MODE
 import io.ghyeok.stickyswitch.widget.StickySwitch
@@ -70,12 +72,16 @@ class EditMemoActivity : AppCompatActivity() {
 
         // 보기 모드에서 수정 버튼 클릭
         if (mode == VIEW_MODE) {
-            btn_edit.setOnClickListener { setEditMode() }
+            btn_edit.setOnClickListener {
+                setEditMode()
+                mode = EDIT_MODE
+            }
         }
 
         if (mode != VIEW_MODE) {
             callExternalStoragePermission()
         }
+
         switch_add_photo.onSelectedChangeListener = object: StickySwitch.OnSelectedChangeListener {
             override fun onSelectedChange(direction: StickySwitch.Direction, text: String) {
                 when(direction.name) {
@@ -84,8 +90,10 @@ class EditMemoActivity : AppCompatActivity() {
                     }
                     off -> {
                         image_scrollview.visibility = View.GONE
-                        photoAdapter.photoList.clear()
-                        photoAdapter.notifyDataSetChanged()
+                        if(mode == ADD_MODE) {
+                            photoAdapter.photoList.clear()
+                            photoAdapter.notifyDataSetChanged()
+                        }
                     }
                 }
             }
@@ -115,7 +123,16 @@ class EditMemoActivity : AppCompatActivity() {
         }
 
         // 뒤로가기 버튼 클릭
-        btn_back.setOnClickListener { finish() }
+        btn_back.setOnClickListener {
+            when (mode) {
+                EDIT_MODE -> {
+                    setViewMode(intent)
+                    mode = VIEW_MODE
+                    photoList.clear()
+                }
+                else -> finish()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -130,12 +147,13 @@ class EditMemoActivity : AppCompatActivity() {
     fun saveMemo(view: View) {
         val title = et_title.text.toString().trim()
         val content = et_content.text.toString().trim()
-        if (title.isEmpty() || content.isEmpty()) {
-            Toast.makeText(this, "제목과 내용을 입력하세요.", Toast.LENGTH_SHORT).show()
+
+        val photoList = photoAdapter.photoList
+        if (title.isEmpty() && content.isEmpty() && photoList.isEmpty()) {
+            Toast.makeText(this, "저장할 내용이 없습니다!", Toast.LENGTH_SHORT).show()
             return
         }
         // 비트 맵을 캐시에 저장
-        val photoList = photoAdapter.photoList
         val photoNameList = ArrayList<String>()
         for (photoUri in photoList) {
             lateinit var bitmap: Bitmap
@@ -199,7 +217,6 @@ class EditMemoActivity : AppCompatActivity() {
         et_content.isEnabled = false
         btn_save.visibility = View.GONE
         image_scrollview.visibility = View.GONE
-        cv_imgSlider.visibility = View.VISIBLE
         switch_add_photo.visibility = View.GONE
 
         val params = et_content.layoutParams as RelativeLayout.LayoutParams
@@ -210,6 +227,12 @@ class EditMemoActivity : AppCompatActivity() {
         renewItems(imgName)
         imageSlider.setIndicatorAnimation(IndicatorAnimations.SLIDE)
         imageSlider.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION)
+
+        if(imgSlideradapter.count == 0) {
+            cv_imgSlider.visibility = View.GONE
+        } else {
+            cv_imgSlider.visibility = View.VISIBLE
+        }
     }
 
     private fun setEditMode() {
@@ -217,7 +240,6 @@ class EditMemoActivity : AppCompatActivity() {
         et_title.isEnabled = true
         et_content.isEnabled = true
         btn_save.visibility = View.VISIBLE
-        image_scrollview.visibility = View.VISIBLE
         cv_imgSlider.visibility = View.GONE
         switch_add_photo.visibility = View.VISIBLE
         var params = et_content.layoutParams as RelativeLayout.LayoutParams
@@ -225,19 +247,20 @@ class EditMemoActivity : AppCompatActivity() {
         params = switch_add_photo.layoutParams as RelativeLayout.LayoutParams
         params.addRule(RelativeLayout.ALIGN_PARENT_END, R.id.rl_appbar)
 
-//        val imgName = intent.getStringExtra(EXTRA_PHOTO)
         val imgNames = intent.getSerializableExtra(EXTRA_PHOTO) as ArrayList<String>
         for(imgName in imgNames) {
             val imgUri = getUriFromCacheDir(imgName)
             photoList.add(imgUri)
         }
         photoAdapter.notifyDataSetChanged()
-//        if (imgName != null) {
-//            val imgBitmap = getBitmapFromCacheDir(imgName)
-//            Glide.with(this@EditMemoActivity)
-//                .load(imgBitmap)
-//                .into(iv_thumbnail)
-//        }
+
+        if (photoAdapter.itemCount == 0) {
+            image_scrollview.visibility = View.GONE
+        }
+        else {
+            image_scrollview.visibility = View.VISIBLE
+            switch_add_photo.setDirection(StickySwitch.Direction.RIGHT)
+        }
     }
 
     private fun renewItems(imgNames: ArrayList<String>) {

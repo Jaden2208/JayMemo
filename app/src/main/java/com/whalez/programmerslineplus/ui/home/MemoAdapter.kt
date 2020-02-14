@@ -18,7 +18,6 @@ import com.whalez.programmerslineplus.data.Memo
 import kotlinx.android.synthetic.main.memo_item.view.*
 import java.io.File
 
-
 class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.MemoHolder>(
     DiffCallback()
 ) {
@@ -33,11 +32,14 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
         val currentMemo = getItem(position)
         holder.title.text = currentMemo.title
         holder.content.text = currentMemo.content
-        if (currentMemo.photos[0] != "none") {
+        if (currentMemo.photos.size > 0) {
             val img = getBitmapFromCacheDir(currentMemo.photos[0])
             Glide.with(holder.thumbnail.context)
                 .load(img)
                 .into(holder.thumbnail)
+            holder.thumbnail.visibility = View.VISIBLE
+        } else {
+            holder.thumbnail.visibility = View.GONE
         }
 
     }
