@@ -98,7 +98,7 @@
             android:layout_marginTop="8dp"
             android:layout_below="@+id/et_title"/>
 
-        <HorizontalScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/image_scrollview"
             android:layout_width="wrap_content"
             android:layout_height="100dp"
@@ -106,6 +106,7 @@
             android:visibility="gone">
 
             <LinearLayout
+                android:descendantFocusability="blocksDescendants"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
@@ -125,7 +126,7 @@
 
             </LinearLayout>
 
-        </HorizontalScrollView>
+        </androidx.core.widget.NestedScrollView>
 
         <View
             android:id="@+id/line2"
