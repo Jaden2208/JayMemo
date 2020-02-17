@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.skydoves.powermenu.kotlin.powerMenu
 import com.whalez.programmerslineplus.R
 import com.whalez.programmerslineplus.data.Memo
+import com.whalez.programmerslineplus.ui.detail.DetailMemoActivity
 import com.whalez.programmerslineplus.ui.edit.EditMemoActivity
 import com.whalez.programmerslineplus.ui.home.menu.MenuFactory
 import com.whalez.programmerslineplus.ui.home.menu.MenuFactory.Companion.APP_INFO
@@ -29,7 +30,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var memoViewModel: MemoViewModel
+    lateinit var memoViewModel: MemoViewModel
+
     private val mainMenu by powerMenu(MenuFactory::class)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 메뉴 버튼 클릭
-        btn_menu.setOnClickListener { mainMenu.showAsDropDown(it) }
+        btn_menu.setOnClickListener { mainMenu.showAsAnchorCenter(it) }
         mainMenu.setOnMenuItemClickListener { position, item ->
             when (position) {
                 DELETE_ALL -> {
@@ -114,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         memoAdapter.setOnItemClickListener(object :
             MemoAdapter.OnItemClickListener {
             override fun onItemClick(memo: Memo) {
-                val intent = Intent(this@MainActivity, EditMemoActivity::class.java)
+                val intent = Intent(this@MainActivity, DetailMemoActivity::class.java)
                 intent.putExtra(EXTRA_ID, memo.id)
                 intent.putExtra(EXTRA_TITLE, memo.title)
                 intent.putExtra(EXTRA_CONTENT, memo.content)
@@ -128,11 +130,11 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == ADD_MEMO_REQUEST && resultCode == RESULT_OK) {
-            val title = data!!.getStringExtra(EXTRA_TITLE)
-            val content = data.getStringExtra(EXTRA_CONTENT)
-            val photos = data.getSerializableExtra(EXTRA_PHOTO) as ArrayList<String>
+            val title = data!!.getStringExtra(EXTRA_TITLE)!!
+            val content = data.getStringExtra(EXTRA_CONTENT)!!
+            val photos = data.getStringArrayListExtra(EXTRA_PHOTO)!!
 
-            val memo = Memo(title!!, content!!, photos)
+            val memo = Memo(title, content, photos)
 
             memoViewModel.insert(memo)
 
@@ -144,15 +146,15 @@ class MainActivity : AppCompatActivity() {
                 return
             }
 
-            val title = data.getStringExtra(EXTRA_TITLE)
-            val content = data.getStringExtra(EXTRA_CONTENT)
-            val photos = data.getSerializableExtra(EXTRA_PHOTO) as ArrayList<String>
-            val memo = Memo(title!!, content!!, photos)
+            val title = data.getStringExtra(EXTRA_TITLE)!!
+            val content = data.getStringExtra(EXTRA_CONTENT)!!
+            val photos = data.getStringArrayListExtra(EXTRA_PHOTO)!!
+            val memo = Memo(title, content, photos)
             memo.id = id
 
             memoViewModel.update(memo)
 
-            Toast.makeText(this, "새 메모가 수정되었습니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "메모가 수정되었습니다.", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(this, "새 메모가 저장되지 않았습니다!", Toast.LENGTH_SHORT).show()
         }

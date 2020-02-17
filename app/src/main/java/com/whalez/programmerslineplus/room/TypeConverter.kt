@@ -1,4 +1,4 @@
-package com.whalez.programmerslineplus
+package com.whalez.programmerslineplus.room
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

@@ -1,8 +1,7 @@
 package com.whalez.programmerslineplus.ui.home
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.whalez.programmerslineplus.R
 import com.whalez.programmerslineplus.data.Memo
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import kotlinx.android.synthetic.main.memo_item.view.*
 import java.io.File
 
@@ -32,33 +32,19 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
         val currentMemo = getItem(position)
         holder.title.text = currentMemo.title
         holder.content.text = currentMemo.content
+        Log.d(TAG, "onBindViewHolder")
+        Log.d(TAG, currentMemo.photos.size.toString())
         if (currentMemo.photos.size > 0) {
-            val img = getBitmapFromCacheDir(currentMemo.photos[0])
+            val thumbnailName = currentMemo.photos[0]
+            val fileDir = File(context.cacheDir.toString())
+            val imgUri = Uri.fromFile(File("${fileDir}/${thumbnailName}.jpg"))
             Glide.with(holder.thumbnail.context)
-                .load(img)
+                .load(imgUri)
                 .into(holder.thumbnail)
             holder.thumbnail.visibility = View.VISIBLE
         } else {
             holder.thumbnail.visibility = View.GONE
         }
-
-    }
-
-    private fun getBitmapFromCacheDir(imgName: String): Bitmap {
-        val file = File(context.cacheDir.toString())
-        Log.d("kkk cacheDir in Adapter", context.cacheDir.toString())
-
-        val files: Array<File> = file.listFiles()!!
-        lateinit var imgBitmap: Bitmap
-        for (tempFile in files) {
-            if (tempFile.name.contains(imgName)) {
-                Log.d("kkk find!", tempFile.name)
-                Log.d("kkk file", file.toString())
-                Log.d("kkk tempFile", tempFile.toString())
-                imgBitmap = BitmapFactory.decodeFile("${file}/${tempFile.name}")
-            }
-        }
-        return imgBitmap
     }
 
     fun getMemoAt(position: Int): Memo {
@@ -97,7 +83,8 @@ class DiffCallback : DiffUtil.ItemCallback<Memo>() {
 
     override fun areContentsTheSame(oldItem: Memo, newItem: Memo): Boolean {
         return oldItem.title == newItem.title &&
-                oldItem.content == newItem.content
+                oldItem.content == newItem.content &&
+                oldItem.photos == newItem.photos
     }
 
 }

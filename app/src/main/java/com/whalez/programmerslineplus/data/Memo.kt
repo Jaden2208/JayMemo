@@ -1,7 +1,6 @@
 package com.whalez.programmerslineplus.data
 
 import androidx.room.*
-import com.whalez.programmerslineplus.TypeConverter
 
 @Entity
 data class Memo(

@@ -1,12 +1,14 @@
 package com.whalez.programmerslineplus.ui.home
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import androidx.room.Room
 import com.whalez.programmerslineplus.data.Memo
 import com.whalez.programmerslineplus.room.MemoDatabase
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

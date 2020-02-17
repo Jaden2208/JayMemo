@@ -1,6 +1,5 @@
-package com.whalez.programmerslineplus.ui.edit
+package com.whalez.programmerslineplus.ui.detail
 
-import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -9,16 +8,15 @@ import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.smarteist.autoimageslider.SliderViewAdapter
 import com.whalez.programmerslineplus.R
-import kotlinx.android.synthetic.main.image_slider_layout_item.view.*
+import kotlinx.android.synthetic.main.image_slider_item.view.*
 
-class ImageSliderAdapter(private val context: Context) :
-    SliderViewAdapter<ImageSliderAdapter.SliderAdapterVH>() {
+class ImageSliderAdapter : SliderViewAdapter<ImageSliderAdapter.SliderAdapterVH>() {
 
     private var sliderItems = ArrayList<Uri>()
 
     override fun onCreateViewHolder(parent: ViewGroup): SliderAdapterVH {
         val inflate: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.image_slider_layout_item, parent, false)
+            .inflate(R.layout.image_slider_item, parent, false)
         return SliderAdapterVH(inflate)
     }
 
@@ -41,15 +39,17 @@ class ImageSliderAdapter(private val context: Context) :
         notifyDataSetChanged()
     }
 
-    fun deleteItem(position: Int) {
-        this.sliderItems.removeAt(position)
-        notifyDataSetChanged()
-    }
-
-    fun addItem(sliderItem: Uri){
-        this.sliderItems.add(sliderItem)
-        notifyDataSetChanged()
-    }
+//    fun deleteItem(position: Int) {
+//        this.sliderItems.removeAt(position)
+//        notifyDataSetChanged()
+//    }
+//
+//    fun addItem(sliderItem: Uri){
+//        this.sliderItems.add(sliderItem)
+//        notifyDataSetChanged()
+//    }
+//
+//    fun getAllItems() = sliderItems
 
 
     inner class SliderAdapterVH(val itemView: View) :

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.edit.EditMemoActivity">
+    tools:context=".ui.detail.DetailMemoActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -22,33 +22,21 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentStart="true"
                 android:background="@android:color/transparent"
+                android:contentDescription="뒤로가기"
                 android:gravity="center"
                 android:padding="8dp"
                 android:src="@drawable/ic_left_back" />
 
             <ImageButton
-                android:id="@+id/btn_add_photo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_img_btn"
-                android:background="@android:color/transparent"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="8dp"
-                android:padding="5dp"
-                android:layout_toStartOf="@+id/tv_bar_title"/>
-
-            <TextView
-                android:id="@+id/tv_bar_title"
+                android:id="@+id/btn_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
                 android:layout_margin="5dp"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:text="새 메모"
-                android:textColor="#fff"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:background="@android:color/transparent"
+                android:contentDescription="수정하기"
+                android:padding="10dp"
+                android:src="@drawable/ic_edit" />
 
         </RelativeLayout>
 
@@ -60,14 +48,13 @@
         android:layout_height="match_parent"
         android:padding="8dp">
 
-        <EditText
-            android:id="@+id/et_title"
+        <TextView
+            android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:ems="10"
-            android:importantForAutofill="no"
             android:padding="3dp"
+            android:text="제목"
             android:textColor="@color/colorPrimaryDeepDark"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -76,63 +63,62 @@
             android:id="@+id/line1"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#a0a0a0"
+            android:layout_below="@+id/tv_title"
             android:layout_marginTop="8dp"
-            android:layout_below="@+id/et_title"/>
+            android:background="#a0a0a0" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_photo"
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_imgSlider"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/line1"
-            android:visibility="visible"/>
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="6dp">
+
+            <com.smarteist.autoimageslider.SliderView
+                android:id="@+id/imageSlider"
+                android:layout_width="wrap_content"
+                android:layout_height="300dp"
+                app:sliderAnimationDuration="200"
+                app:sliderAutoCycleDirection="back_and_forth"
+                app:sliderAutoCycleEnabled="false"
+                app:sliderCircularHandlerEnabled="false"
+                app:sliderIndicatorAnimationDuration="200"
+                app:sliderIndicatorGravity="center_horizontal|bottom"
+                app:sliderIndicatorMargin="15dp"
+                app:sliderIndicatorOrientation="horizontal"
+                app:sliderIndicatorPadding="3dp"
+                app:sliderIndicatorRadius="2dp"
+                app:sliderIndicatorSelectedColor="#5A5A5A"
+                app:sliderIndicatorUnselectedColor="#FFF"
+                app:sliderScrollTimeInSec="1"
+                app:sliderStartAutoCycle="false" />
+
+        </androidx.cardview.widget.CardView>
 
         <View
             android:id="@+id/line2"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#a0a0a0"
-            android:layout_below="@+id/rv_photo"/>
+            android:layout_below="@+id/cv_imgSlider"
+            android:background="#a0a0a0" />
 
-        <EditText
-            android:id="@+id/et_content"
+        <TextView
+            android:id="@+id/tv_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/btn_save"
             android:layout_below="@+id/line2"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="@android:color/transparent"
-            android:ems="10"
             android:gravity="start"
-            android:importantForAutofill="no"
             android:padding="3dp"
+            android:text="내용"
             android:textColor="#000"
             android:textSize="18sp" />
 
-        <Button
-            android:id="@+id/btn_save"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/button_ripple_effect"
-            android:text="저장하기"
-            android:textColor="#fff"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <FrameLayout
-            android:id="@+id/fl_progressbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#a0a0a0a0"
-            android:visibility="gone">
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:indeterminateTint="@color/colorPrimaryDark"/>
-        </FrameLayout>
     </RelativeLayout>
 
 </LinearLayout>
