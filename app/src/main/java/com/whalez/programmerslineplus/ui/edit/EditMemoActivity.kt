@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gun0912.tedpermission.PermissionListener
@@ -25,6 +26,8 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import kotlinx.android.synthetic.main.activity_edit_memo.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -106,6 +109,7 @@ class EditMemoActivity : AppCompatActivity() {
         // 저장하기 버튼 클릭
         btn_save.setOnClickListener {
             startSaveProgress()
+
             val title = et_title.text.toString().trim()
             val content = et_content.text.toString().trim()
             if (title.isEmpty() && content.isEmpty() && photoList.isEmpty()) {
@@ -114,29 +118,37 @@ class EditMemoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             val photos = ArrayList<String>()
-            for (photoUri in photoList) {
-                val bitmap = if (Build.VERSION.SDK_INT < 28) {
-                    MediaStore.Images.Media.getBitmap(this.contentResolver, photoUri)
-                } else {
-                    val source = ImageDecoder.createSource(this.contentResolver, photoUri)
-                    ImageDecoder.decodeBitmap(source)
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                for (photoUri in photoList) {
+                    Log.d(TAG, "4-1")
+                    val bitmap = if (Build.VERSION.SDK_INT < 28) {
+                        MediaStore.Images.Media.getBitmap(
+                            this@EditMemoActivity.contentResolver, photoUri
+                        )
+                    } else {
+                        val source = ImageDecoder.createSource(
+                            this@EditMemoActivity.contentResolver, photoUri
+                        )
+                        ImageDecoder.decodeBitmap(source)
+                    }
+                    val imgName = UUID.randomUUID().toString()
+                    saveBitmapOnCache(bitmap, imgName)
+                    photos.add(imgName)
                 }
-                val imgName = UUID.randomUUID().toString()
-                saveBitmapOnCache(bitmap, imgName)
-                photos.add(imgName)
+
+                intent.putExtra(EXTRA_TITLE, title)
+                intent.putExtra(EXTRA_CONTENT, content)
+                intent.putExtra(EXTRA_PHOTO, photos)
+
+                val id = intent.getIntExtra(EXTRA_ID, -1)
+                if (id != -1) {
+                    intent.putExtra(EXTRA_ID, id)
+                }
+
+                setResult(RESULT_OK, intent)
+                finish()
             }
-
-            intent.putExtra(EXTRA_TITLE, title)
-            intent.putExtra(EXTRA_CONTENT, content)
-            intent.putExtra(EXTRA_PHOTO, photos)
-
-            val id = intent.getIntExtra(EXTRA_ID, -1)
-            if (id != -1) {
-                intent.putExtra(EXTRA_ID, id)
-            }
-
-            setResult(RESULT_OK, intent)
-            finish()
         }
     }
 
@@ -157,17 +169,21 @@ class EditMemoActivity : AppCompatActivity() {
     }
 
     private fun startSaveProgress() {
-        fl_progressbar.visibility = View.VISIBLE
-        fl_progressbar.bringToFront()
+        progressbar_layout.visibility = View.VISIBLE
+        progressbar_layout.bringToFront()
         et_title.isEnabled = false
         et_content.isEnabled = false
+        btn_add_photo.isEnabled = false
+        btn_back.isEnabled = false
         btn_save.isEnabled = false
     }
 
     private fun stopSaveProgress() {
-        fl_progressbar.visibility = View.GONE
+        progressbar_layout.visibility = View.GONE
         et_title.isEnabled = true
         et_content.isEnabled = true
+        btn_add_photo.isEnabled = true
+        btn_back.isEnabled = true
         btn_save.isEnabled = true
     }
 
