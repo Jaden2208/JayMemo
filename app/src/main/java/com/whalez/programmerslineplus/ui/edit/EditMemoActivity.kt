@@ -205,7 +205,6 @@ class EditMemoActivity : AppCompatActivity() {
 
             lifecycleScope.launch(Dispatchers.IO) {
                 for (photoUri in photoList) {
-//                    Log.d(TAG, "photoUri: ${photoUri.toString().substring(0, 4)}")
                     val bitmap =
                         if (photoUri.toString().substring(0, 4) == "http") {
                             BitmapFactory.decodeStream(
