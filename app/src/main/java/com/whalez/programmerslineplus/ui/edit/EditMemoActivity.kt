@@ -1,18 +1,20 @@
 package com.whalez.programmerslineplus.ui.edit
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.RelativeLayout
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,16 +22,22 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import com.skydoves.powermenu.kotlin.powerMenu
 import com.whalez.programmerslineplus.R
+import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.FROM_ALBUM
+import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.FROM_CAMERA
+import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.FROM_URL
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
+import com.whalez.programmerslineplus.utils.showToast
 import kotlinx.android.synthetic.main.activity_edit_memo.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.joda.time.DateTime
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -41,6 +49,8 @@ class EditMemoActivity : AppCompatActivity() {
     private val photoAdapter = PhotoAdapter(photoList)
 
     private var permissionChecked = false
+
+    private var photoFileFromCamera: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,32 +83,23 @@ class EditMemoActivity : AppCompatActivity() {
         // 사진 추가 버튼
         btn_add_photo.setOnClickListener { imgLoadOptionsMenu.showAsAnchorCenter(it) }
         imgLoadOptionsMenu.setOnMenuItemClickListener { position, item ->
-
             when (position) {
-                ImageLoadOptionsFactory.FROM_CAMERA -> {
+                FROM_CAMERA -> {
                     if (permissionChecked) {
-                        Toast.makeText(this, item.title, Toast.LENGTH_SHORT).show()
+                        takePicture()
                     } else {
-                        Toast.makeText(
-                            this@EditMemoActivity,
-                            resources.getString(R.string.permission_require_msg),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showToast(this, resources.getString(R.string.permission_require_msg))
                     }
                 }
-                ImageLoadOptionsFactory.FROM_ALBUM -> {
+                FROM_ALBUM -> {
                     if (permissionChecked) {
-                        goToAlbum()
+                        getPictureFromGallery()
                     } else {
-                        Toast.makeText(
-                            this@EditMemoActivity,
-                            resources.getString(R.string.permission_require_msg),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showToast(this, resources.getString(R.string.permission_require_msg))
                     }
                 }
-                ImageLoadOptionsFactory.FROM_URL -> {
-                    Toast.makeText(this, item.title, Toast.LENGTH_SHORT).show()
+                FROM_URL -> {
+                    showToast(this, item.title)
                 }
             }
         }
@@ -113,7 +114,7 @@ class EditMemoActivity : AppCompatActivity() {
             val title = et_title.text.toString().trim()
             val content = et_content.text.toString().trim()
             if (title.isEmpty() && content.isEmpty() && photoList.isEmpty()) {
-                Toast.makeText(this, "저장할 내용이 없습니다!", Toast.LENGTH_SHORT).show()
+                showToast(this, "저장할 내용이 없습니다!")
                 stopSaveProgress()
                 return@setOnClickListener
             }
@@ -121,7 +122,6 @@ class EditMemoActivity : AppCompatActivity() {
 
             lifecycleScope.launch(Dispatchers.IO) {
                 for (photoUri in photoList) {
-                    Log.d(TAG, "4-1")
                     val bitmap = if (Build.VERSION.SDK_INT < 28) {
                         MediaStore.Images.Media.getBitmap(
                             this@EditMemoActivity.contentResolver, photoUri
@@ -154,18 +154,67 @@ class EditMemoActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (data != null && requestCode == ImageLoadOptionsFactory.FROM_ALBUM) {
-            photoList.add(data.data!!)
-            photoAdapter.notifyDataSetChanged()
+        if (resultCode != Activity.RESULT_OK){
+            showToast(this, "취소 되었습니다.")
+            return
+        }
+        when (requestCode) {
+            FROM_CAMERA -> {
+                Log.d(TAG, "카메라는 잘 전달 받음")
+
+                val photoUriFromCamera = Uri.fromFile(photoFileFromCamera)
+                photoList.add(photoUriFromCamera)
+                photoAdapter.notifyDataSetChanged()
+                photoFileFromCamera = null
+            }
+            FROM_ALBUM -> {
+                photoList.add(data!!.data!!)
+                photoAdapter.notifyDataSetChanged()
+            }
         }
     }
 
-    private fun goToAlbum() {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.setDataAndType(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*"
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val timestamp = DateTime.now().toLocalDateTime().toString("yyyyMMdd_HHmmss")
+        val storageDir= getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timestamp}_",
+            ".jpg",
+            storageDir
         )
-        startActivityForResult(intent, ImageLoadOptionsFactory.FROM_ALBUM)
+    }
+
+    private fun takePicture() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            // Ensure that there's a camera activity to handle the intent
+            takePictureIntent.resolveActivity(packageManager)?.also {
+                // Create the File where the photo should go
+                photoFileFromCamera = createImageFile()
+                // Continue only if the File was successfully created
+                photoFileFromCamera!!.also {
+                    val photoURI: Uri = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                        FileProvider.getUriForFile(this,
+                            "com.whalez.programmerslineplus.provider", it)
+                    } else {
+                        Uri.fromFile(it)
+                    }
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    startActivityForResult(takePictureIntent, FROM_CAMERA)
+                }
+            }
+        }
+
+    }
+
+    private fun getPictureFromGallery() {
+        Intent(Intent.ACTION_PICK).also { getPictureIntent ->
+            getPictureIntent.setDataAndType(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*"
+            ).also {
+                startActivityForResult(getPictureIntent, FROM_ALBUM)
+            }
+        }
     }
 
     private fun startSaveProgress() {
@@ -207,16 +256,16 @@ class EditMemoActivity : AppCompatActivity() {
     private fun callPermissions() {
         val permissionListener = object : PermissionListener {
             override fun onPermissionGranted() {
-                Log.d("kkk", "저장소 접근 권한 주어짐")
+                Log.d(TAG, "저장소 접근 권한 주어짐")
                 permissionChecked = true
             }
 
             override fun onPermissionDenied(deniedPermissions: ArrayList<String>?) {
-                Log.d("kkk", "저장소 접근 권한 거절")
+                Log.d(TAG, "저장소 접근 권한 거절")
                 permissionChecked = false
-
             }
         }
+
         TedPermission.with(this@EditMemoActivity)
             .setPermissionListener(permissionListener)
             .setRationaleMessage(resources.getString(R.string.permission_require_msg))

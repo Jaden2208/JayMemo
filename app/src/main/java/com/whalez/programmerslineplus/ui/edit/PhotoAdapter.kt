@@ -1,6 +1,5 @@
 package com.whalez.programmerslineplus.ui.edit
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View

@@ -22,6 +22,7 @@ class MemoViewModel(application: Application): AndroidViewModel(application) {
     fun insert(memo: Memo) {
         viewModelScope.launch(Dispatchers.IO) {
             db.memoDao().insert(memo)
+            Log.d(TAG+"inserted", memo.id.toString())
         }
     }
 

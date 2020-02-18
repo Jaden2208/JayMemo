@@ -2,7 +2,6 @@ package com.whalez.programmerslineplus.ui.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
@@ -26,6 +25,8 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
+import com.whalez.programmerslineplus.utils.isDoubleClicked
+import com.whalez.programmerslineplus.utils.showToast
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 메뉴 버튼 클릭
-        btn_menu.setOnClickListener { mainMenu.showAsAnchorCenter(it) }
+        btn_menu.setOnClickListener { mainMenu.showAsDropDown(it) }
         mainMenu.setOnMenuItemClickListener { position, item ->
             when (position) {
                 DELETE_ALL -> {
@@ -71,13 +72,13 @@ class MainActivity : AppCompatActivity() {
                     builder.setMessage("모든 메모를 삭제하시겠습니까?")
                         .setPositiveButton("예") { _, _ ->
                             memoViewModel.deleteAll()
-                            Toast.makeText(this@MainActivity, "모든 메모가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                            showToast(this, "모든 메모가 삭제되었습니다.")
                         }
                         .setNegativeButton("아니요") { _, _ -> }
                         .show()
                 }
                 APP_INFO -> {
-                    Toast.makeText(this, item.title, Toast.LENGTH_SHORT).show()
+                    showToast(this, item.title)
                 }
 
             }
@@ -103,7 +104,7 @@ class MainActivity : AppCompatActivity() {
                     .setCancelable(false)
                     .setPositiveButton("예") { _, _ ->
                         memoViewModel.delete(memoAdapter.getMemoAt(viewHolder.adapterPosition))
-                        Toast.makeText(this@MainActivity, "삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                        showToast(this@MainActivity, "삭제되었습니다.")
                     }
                     .setNegativeButton("아니요") { _, _ ->
                         memoAdapter.notifyDataSetChanged()
@@ -116,6 +117,7 @@ class MainActivity : AppCompatActivity() {
         memoAdapter.setOnItemClickListener(object :
             MemoAdapter.OnItemClickListener {
             override fun onItemClick(memo: Memo) {
+                if(isDoubleClicked()) return
                 val intent = Intent(this@MainActivity, DetailMemoActivity::class.java)
                 intent.putExtra(EXTRA_ID, memo.id)
                 intent.putExtra(EXTRA_TITLE, memo.title)
@@ -138,11 +140,11 @@ class MainActivity : AppCompatActivity() {
 
             memoViewModel.insert(memo)
 
-            Toast.makeText(this, "메모 저장완료", Toast.LENGTH_SHORT).show()
+            showToast(this, "메모 저장완료")
         } else if (requestCode == EDIT_MEMO_REQUEST && resultCode == RESULT_OK) {
             val id = data!!.getIntExtra(EXTRA_ID, -1)
             if (id == -1) {
-                Toast.makeText(this, "메모가 수정되지 않았습니다!", Toast.LENGTH_SHORT).show()
+                showToast(this, "메모가 수정되지 않았습니다!")
                 return
             }
 
@@ -153,10 +155,9 @@ class MainActivity : AppCompatActivity() {
             memo.id = id
 
             memoViewModel.update(memo)
-
-            Toast.makeText(this, "메모가 수정되었습니다.", Toast.LENGTH_SHORT).show()
+            showToast(this, "메모가 수정되었습니다.")
         } else {
-            Toast.makeText(this, "새 메모가 저장되지 않았습니다!", Toast.LENGTH_SHORT).show()
+            showToast(this, "새 메모가 저장되지 않았습니다!")
         }
     }
 }

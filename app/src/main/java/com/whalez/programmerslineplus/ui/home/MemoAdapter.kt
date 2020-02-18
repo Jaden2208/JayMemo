@@ -32,8 +32,6 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
         val currentMemo = getItem(position)
         holder.title.text = currentMemo.title
         holder.content.text = currentMemo.content
-        Log.d(TAG, "onBindViewHolder")
-        Log.d(TAG, currentMemo.photos.size.toString())
         if (currentMemo.photos.size > 0) {
             val thumbnailName = currentMemo.photos[0]
             val fileDir = File(context.cacheDir.toString())
@@ -78,6 +76,9 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
 
 class DiffCallback : DiffUtil.ItemCallback<Memo>() {
     override fun areItemsTheSame(oldItem: Memo, newItem: Memo): Boolean {
+        if(oldItem.id != newItem.id){
+            Log.d(TAG, "새로운 메모 추가하기 : " + newItem.title)
+        }
         return oldItem.id == newItem.id
     }
 
