@@ -84,4 +84,7 @@ dependencies {
     // 출처: https://github.com/JodaOrg/joda-time
     implementation 'joda-time:joda-time:2.10.5'
 
+    // SwipeRefreshLayout
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+
 }

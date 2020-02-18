@@ -35,7 +35,7 @@ class ImageLoadOptionsFactory: PowerMenu.Factory() {
             setMenuRadius(10f)
             setMenuShadow(10f)
             setTextColorResource(R.color.colorBlack)
-            setTextSize(12)
+            setTextSize(15)
             setTextGravity(Gravity.CENTER)
             setTextTypeface(Typeface.create("sans-serif-light", Typeface.BOLD))
             setSelectedTextColor(Color.WHITE)
