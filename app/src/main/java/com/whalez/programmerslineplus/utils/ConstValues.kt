@@ -10,6 +10,10 @@ class ConstValues {
         const val EXTRA_TITLE = "EXTRA_TITLE"
         const val EXTRA_CONTENT = "EXTRA_CONTENT"
         const val EXTRA_PHOTO = "EXTRA_PHOTO"
+        const val EXTRA_TIMESTAMP = "EXTRA_TIMESTAMP"
+
+        const val ADD_MODE = 0
+        const val EDIT_MODE = 1
 
         const val ADD_MEMO_REQUEST = 1
         const val EDIT_MEMO_REQUEST = 2

@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import androidx.room.Room
-import com.whalez.programmerslineplus.data.Memo
+import com.whalez.programmerslineplus.room.data.Memo
 import com.whalez.programmerslineplus.room.MemoDatabase
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,7 @@ class MemoViewModel(application: Application): AndroidViewModel(application) {
     fun insert(memo: Memo) {
         viewModelScope.launch(Dispatchers.IO) {
             db.memoDao().insert(memo)
-            Log.d(TAG+"inserted", memo.id.toString())
+            Log.d(TAG, "add:"+ memo.id)
         }
     }
 

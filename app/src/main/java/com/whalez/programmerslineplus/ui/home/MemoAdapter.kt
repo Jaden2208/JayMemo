@@ -13,9 +13,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.whalez.programmerslineplus.R
-import com.whalez.programmerslineplus.data.Memo
+import com.whalez.programmerslineplus.room.data.Memo
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import kotlinx.android.synthetic.main.memo_item.view.*
+import org.joda.time.DateTime
 import java.io.File
 
 class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.MemoHolder>(
@@ -32,6 +33,7 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
         val currentMemo = getItem(position)
         holder.title.text = currentMemo.title
         holder.content.text = currentMemo.content
+        holder.timestamp.text = DateTime(currentMemo.timestamp).toString("yyyy년 MM월 dd일 HH:mm:ss")
         if (currentMemo.photos.size > 0) {
             val thumbnailName = currentMemo.photos[0]
             val fileDir = File(context.cacheDir.toString())
@@ -55,6 +57,7 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
         val title: TextView = itemView.tv_title
         val content: TextView = itemView.tv_content
         val thumbnail: ImageView = itemView.iv_thumbnail
+        val timestamp: TextView = itemView.tv_timestamp
         init {
             itemView.setOnClickListener {
                 val position = adapterPosition
@@ -76,10 +79,9 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
 
 class DiffCallback : DiffUtil.ItemCallback<Memo>() {
     override fun areItemsTheSame(oldItem: Memo, newItem: Memo): Boolean {
-        if(oldItem.id != newItem.id){
-            Log.d(TAG, "새로운 메모 추가하기 : " + newItem.title)
-        }
-        return oldItem.id == newItem.id
+        // recyclerview 범위를 초과 했을 때 diffcallback이 먹지 않아 임시로 false 처리
+        return false
+//        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: Memo, newItem: Memo): Boolean {

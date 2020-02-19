@@ -14,8 +14,12 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EDIT_MEMO_REQU
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TIMESTAMP
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import kotlinx.android.synthetic.main.activity_detail_memo.*
+import kotlinx.android.synthetic.main.activity_detail_memo.tv_content
+import kotlinx.android.synthetic.main.activity_detail_memo.tv_title
+import org.joda.time.DateTime
 import java.io.File
 import kotlin.collections.ArrayList
 
@@ -28,9 +32,11 @@ class DetailMemoActivity : AppCompatActivity() {
         val title = intent.getStringExtra(EXTRA_TITLE)
         val content = intent.getStringExtra(EXTRA_CONTENT)
         val imgNames = intent.getStringArrayListExtra(EXTRA_PHOTO)!!
+        val timestamp = intent.getLongExtra(EXTRA_TIMESTAMP, -1)
 
         tv_title.text = title
         tv_content.text = content
+        tv_detail_timestamp.text = DateTime(timestamp).toString("yyyy년 MM월 dd일 HH:mm:ss")
         if(imgNames.isEmpty()) {
             imageSlider.visibility = View.GONE
             val params = line2.layoutParams as RelativeLayout.LayoutParams
@@ -71,10 +77,12 @@ class DetailMemoActivity : AppCompatActivity() {
             val title = data!!.getStringExtra(EXTRA_TITLE)!!
             val content = data.getStringExtra(EXTRA_CONTENT)!!
             val photos = data.getStringArrayListExtra(EXTRA_PHOTO)!!
+            val timestamp = data.getLongExtra(EXTRA_TIMESTAMP, -1)
 
             intent.putExtra(EXTRA_TITLE, title)
             intent.putExtra(EXTRA_CONTENT, content)
             intent.putExtra(EXTRA_PHOTO, photos)
+            intent.putExtra(EXTRA_TIMESTAMP, timestamp)
             val id = intent.getIntExtra(EXTRA_ID, -1)
             if (id != -1) {
                 intent.putExtra(EXTRA_ID, id)

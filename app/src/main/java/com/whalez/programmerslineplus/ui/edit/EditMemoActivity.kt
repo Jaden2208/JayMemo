@@ -34,11 +34,15 @@ import com.whalez.programmerslineplus.R
 import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.FROM_ALBUM
 import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.FROM_CAMERA
 import com.whalez.programmerslineplus.ui.edit.ImageLoadOptionsFactory.Companion.FROM_URL
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.ADD_MODE
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EDIT_MODE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TIMESTAMP
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
+import com.whalez.programmerslineplus.utils.isInternetAvailable
 import com.whalez.programmerslineplus.utils.showToast
 import kotlinx.android.synthetic.main.activity_edit_memo.*
 import kotlinx.android.synthetic.main.activity_edit_memo.progressbar_layout
@@ -55,6 +59,8 @@ import kotlin.collections.ArrayList
 
 class EditMemoActivity : AppCompatActivity() {
 
+    private var mode = ADD_MODE
+
     private val imgLoadOptionsMenu by powerMenu(ImageLoadOptionsFactory::class)
 
     private val photoList = ArrayList<Uri>()
@@ -64,6 +70,11 @@ class EditMemoActivity : AppCompatActivity() {
 
     private var photoFileFromCamera: File? = null
 
+    private var originalTitle = ""
+    private var originalContent = ""
+    private var originalImage = ArrayList<String>()
+    private var originalImageUri = ArrayList<Uri>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_memo)
@@ -72,15 +83,19 @@ class EditMemoActivity : AppCompatActivity() {
 
         // 수정버튼을 클릭해서 들어온 경우 intent로 전달받은 텍스트, 이미지 불러오기.
         if (intent.hasExtra(EXTRA_ID)) {
+            mode = EDIT_MODE
+            originalTitle = intent.getStringExtra(EXTRA_TITLE)!!
+            originalContent = intent.getStringExtra(EXTRA_CONTENT)!!
+            originalImage = intent.getStringArrayListExtra(EXTRA_PHOTO)!!
             tv_bar_title.visibility = View.GONE
             val params = btn_add_photo.layoutParams as RelativeLayout.LayoutParams
             params.addRule(RelativeLayout.ALIGN_PARENT_END, R.id.rl_appbar)
-            et_title.setText(intent.getStringExtra(EXTRA_TITLE))
-            et_content.setText(intent.getStringExtra(EXTRA_CONTENT))
-            val imgNames = intent.getStringArrayListExtra(EXTRA_PHOTO)!!
-            for (imgName in imgNames) {
+            et_title.setText(originalTitle)
+            et_content.setText(originalContent)
+            for (imgName in originalImage) {
                 val imgUri = Uri.fromFile(File("${File(cacheDir.toString())}/${imgName}.jpg"))
                 photoList.add(imgUri)
+                originalImageUri.add(imgUri)
             }
         }
 
@@ -133,6 +148,10 @@ class EditMemoActivity : AppCompatActivity() {
                         val imageUrl = etUrl.text.toString().trim()
                         if (imageUrl.isEmpty()) {
                             showToast(this, "링크를 입력해주세요!")
+                            return@setOnClickListener
+                        }
+                        if (!isInternetAvailable(this)) {
+                            showToast(this, "인터넷 연결 상태를 확인해주세요!")
                             return@setOnClickListener
                         }
 
@@ -192,21 +211,39 @@ class EditMemoActivity : AppCompatActivity() {
 
         // 저장하기 버튼 클릭
         btn_save.setOnClickListener {
-            startSaveProgress()
 
             val title = et_title.text.toString().trim()
             val content = et_content.text.toString().trim()
             if (title.isEmpty() && content.isEmpty() && photoList.isEmpty()) {
                 showToast(this, "저장할 내용이 없습니다!")
-                stopSaveProgress()
                 return@setOnClickListener
             }
+
+            if(mode == EDIT_MODE){
+                if(originalTitle == title && originalContent == content && originalImageUri == photoList){
+                    showToast(this, "변경된 사항이 없습니다.")
+                    return@setOnClickListener
+                }
+            }
+
+            startSaveProgress()
+
             val photos = ArrayList<String>()
 
             lifecycleScope.launch(Dispatchers.IO) {
                 for (photoUri in photoList) {
                     val bitmap =
                         if (photoUri.toString().substring(0, 4) == "http") {
+                            if(!isInternetAvailable(this@EditMemoActivity)){
+                                lifecycleScope.launch(Dispatchers.Main) {
+                                    showToast(this@EditMemoActivity,
+                                        "첨부된 사진 중에 URL을 통해 받아오는 사진이 있습니다.\n" +
+                                                "인터넷 연결 상태를 확인해주세요.")
+                                    stopSaveProgress()
+                                }
+                                photos.clear()
+                                return@launch
+                            }
                             BitmapFactory.decodeStream(
                                 URL(photoUri.toString()).content as InputStream)
                         } else if (Build.VERSION.SDK_INT < 28) {
@@ -228,6 +265,7 @@ class EditMemoActivity : AppCompatActivity() {
                 intent.putExtra(EXTRA_TITLE, title)
                 intent.putExtra(EXTRA_CONTENT, content)
                 intent.putExtra(EXTRA_PHOTO, photos)
+                intent.putExtra(EXTRA_TIMESTAMP, DateTime().millis)
 
                 val id = intent.getIntExtra(EXTRA_ID, -1)
                 if (id != -1) {

@@ -59,11 +59,21 @@
             android:textSize="22sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/tv_detail_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_below="@+id/tv_title"
+            android:layout_alignParentEnd="true"
+            android:text="timestamp"
+            android:textSize="14sp" />
+
         <View
             android:id="@+id/line1"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_below="@+id/tv_title"
+            android:layout_below="@+id/tv_detail_timestamp"
             android:layout_marginTop="8dp"
             android:background="#a0a0a0" />
 

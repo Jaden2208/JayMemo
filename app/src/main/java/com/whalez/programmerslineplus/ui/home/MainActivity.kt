@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.skydoves.powermenu.kotlin.powerMenu
 import com.whalez.programmerslineplus.R
-import com.whalez.programmerslineplus.data.Memo
+import com.whalez.programmerslineplus.room.data.Memo
 import com.whalez.programmerslineplus.ui.detail.DetailMemoActivity
 import com.whalez.programmerslineplus.ui.edit.EditMemoActivity
 import com.whalez.programmerslineplus.ui.home.menu.MenuFactory
@@ -24,10 +24,12 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EDIT_MEMO_REQU
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_CONTENT
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TIMESTAMP
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.isDoubleClicked
 import com.whalez.programmerslineplus.utils.showToast
 import kotlinx.android.synthetic.main.activity_main.*
+import org.joda.time.DateTime
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,8 +42,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val layoutManager = LinearLayoutManager(this)
-        layoutManager.reverseLayout = true
-        layoutManager.stackFromEnd = true
+//        layoutManager.reverseLayout = true
+//        layoutManager.stackFromEnd = true
         rv_main.layoutManager = layoutManager
         rv_main.setHasFixedSize(true)
 
@@ -123,6 +125,7 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra(EXTRA_TITLE, memo.title)
                 intent.putExtra(EXTRA_CONTENT, memo.content)
                 intent.putExtra(EXTRA_PHOTO, memo.photos)
+                intent.putExtra(EXTRA_TIMESTAMP, memo.timestamp)
                 startActivityForResult(intent, EDIT_MEMO_REQUEST)
             }
         })
@@ -135,12 +138,19 @@ class MainActivity : AppCompatActivity() {
             val title = data!!.getStringExtra(EXTRA_TITLE)!!
             val content = data.getStringExtra(EXTRA_CONTENT)!!
             val photos = data.getStringArrayListExtra(EXTRA_PHOTO)!!
+            val timestamp = data.getLongExtra(EXTRA_TIMESTAMP, -1)
 
-            val memo = Memo(title, content, photos)
+            val memo =
+                Memo(
+                    title,
+                    content,
+                    photos,
+                    timestamp
+                )
 
             memoViewModel.insert(memo)
-
             showToast(this, "메모 저장완료")
+
         } else if (requestCode == EDIT_MEMO_REQUEST && resultCode == RESULT_OK) {
             val id = data!!.getIntExtra(EXTRA_ID, -1)
             if (id == -1) {
@@ -151,7 +161,14 @@ class MainActivity : AppCompatActivity() {
             val title = data.getStringExtra(EXTRA_TITLE)!!
             val content = data.getStringExtra(EXTRA_CONTENT)!!
             val photos = data.getStringArrayListExtra(EXTRA_PHOTO)!!
-            val memo = Memo(title, content, photos)
+            val timestamp = DateTime().millis
+            val memo =
+                Memo(
+                    title,
+                    content,
+                    photos,
+                    timestamp
+                )
             memo.id = id
 
             memoViewModel.update(memo)

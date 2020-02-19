@@ -1,4 +1,4 @@
-package com.whalez.programmerslineplus.data
+package com.whalez.programmerslineplus.room.data
 
 import androidx.room.*
 
@@ -6,7 +6,8 @@ import androidx.room.*
 data class Memo(
     var title: String,
     var content: String,
-    var photos: ArrayList<String>
+    var photos: ArrayList<String>,
+    var timestamp: Long
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
