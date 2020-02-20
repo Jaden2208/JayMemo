@@ -2,7 +2,6 @@ package com.whalez.programmerslineplus.ui.home
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.whalez.programmerslineplus.R
 import com.whalez.programmerslineplus.room.data.Memo
-import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import kotlinx.android.synthetic.main.memo_item.view.*
 import org.joda.time.DateTime
 import java.io.File
@@ -24,9 +22,9 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
 ) {
     private lateinit var listener: OnItemClickListener
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemoHolder {
-        val itemView = LayoutInflater.from(parent.context)
+        val inflate = LayoutInflater.from(parent.context)
             .inflate(R.layout.memo_item, parent, false)
-        return MemoHolder(itemView)
+        return MemoHolder(inflate)
     }
 
     override fun onBindViewHolder(holder: MemoHolder, position: Int) {
@@ -85,9 +83,7 @@ class DiffCallback : DiffUtil.ItemCallback<Memo>() {
     }
 
     override fun areContentsTheSame(oldItem: Memo, newItem: Memo): Boolean {
-        return oldItem.title == newItem.title &&
-                oldItem.content == newItem.content &&
-                oldItem.photos == newItem.photos
+        return oldItem == newItem
     }
 
 }

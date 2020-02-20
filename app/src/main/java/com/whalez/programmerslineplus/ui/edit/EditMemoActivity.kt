@@ -70,16 +70,14 @@ class EditMemoActivity : AppCompatActivity() {
 
     private var photoFileFromCamera: File? = null
 
-    private var originalTitle = ""
-    private var originalContent = ""
-    private var originalImage = ArrayList<String>()
-    private var originalImageUri = ArrayList<Uri>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_memo)
 
-        val intent = intent
+        var originalTitle = ""
+        var originalContent = ""
+        val originalImage: ArrayList<String>
+        val originalImageUri = ArrayList<Uri>()
 
         // 수정버튼을 클릭해서 들어온 경우 intent로 전달받은 텍스트, 이미지 불러오기.
         if (intent.hasExtra(EXTRA_ID)) {

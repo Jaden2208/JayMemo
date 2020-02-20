@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // RecyclerView 초기화
         val layoutManager = LinearLayoutManager(this)
 //        layoutManager.reverseLayout = true
 //        layoutManager.stackFromEnd = true
@@ -53,12 +54,6 @@ class MainActivity : AppCompatActivity() {
         memoViewModel = ViewModelProvider(this).get(MemoViewModel::class.java)
         memoViewModel.getAll().observe(this,
             Observer<List<Memo>> { memos -> memoAdapter.submitList(memos) })
-
-        // 메모 추가
-        btn_add.setOnClickListener {
-            val intent = Intent(this, EditMemoActivity::class.java)
-            startActivityForResult(intent, ADD_MEMO_REQUEST)
-        }
 
         // 메뉴 버튼 클릭
         btn_menu.setOnClickListener { mainMenu.showAsDropDown(it) }
@@ -86,6 +81,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // 슬라이드를 통한 아이템 삭제
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             override fun onMove(
                 recyclerView: RecyclerView,
@@ -129,6 +125,12 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(intent, EDIT_MEMO_REQUEST)
             }
         })
+
+        // 메모 추가 버튼 클릭
+        btn_add.setOnClickListener {
+            val intent = Intent(this, EditMemoActivity::class.java)
+            startActivityForResult(intent, ADD_MEMO_REQUEST)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
