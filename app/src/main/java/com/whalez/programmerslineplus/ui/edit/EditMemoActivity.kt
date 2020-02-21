@@ -97,11 +97,14 @@ class EditMemoActivity : AppCompatActivity() {
             }
         }
 
-        val photoLayoutManager = LinearLayoutManager(applicationContext)
-        photoLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
-        rv_photo.layoutManager = photoLayoutManager
-        rv_photo.itemAnimator = DefaultItemAnimator()
-        rv_photo.adapter = photoAdapter
+        // RecyclerView 초기화
+        rv_photo.apply {
+            val photoLayoutManager = LinearLayoutManager(applicationContext)
+            photoLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
+            layoutManager = photoLayoutManager
+            adapter = photoAdapter
+//            itemAnimator = DefaultItemAnimator()
+        }
 
         callPermissions()
 
@@ -195,7 +198,8 @@ class EditMemoActivity : AppCompatActivity() {
                             return@setOnClickListener
                         }
                         photoList.add(imageUri!!)
-                        photoAdapter.notifyDataSetChanged()
+                        photoAdapter.notifyItemInserted(position)
+//                        photoAdapter.notifyDataSetChanged()
                         builder.dismiss()
                     }
                     builder.setView(dialogView)
@@ -286,12 +290,18 @@ class EditMemoActivity : AppCompatActivity() {
             FROM_CAMERA -> {
                 val photoUriFromCamera = Uri.fromFile(photoFileFromCamera)
                 photoList.add(photoUriFromCamera)
-                photoAdapter.notifyDataSetChanged()
+                val lastPosition = photoList.size - 1
+                photoAdapter.notifyItemInserted(lastPosition)
+                rv_photo.smoothScrollToPosition(lastPosition)
+//                photoAdapter.notifyDataSetChanged()
                 photoFileFromCamera = null
             }
             FROM_ALBUM -> {
                 photoList.add(data!!.data!!)
-                photoAdapter.notifyDataSetChanged()
+                val lastPosition = photoList.size - 1
+                photoAdapter.notifyItemInserted(lastPosition)
+                rv_photo.smoothScrollToPosition(lastPosition)
+//                photoAdapter.notifyDataSetChanged()
             }
         }
     }

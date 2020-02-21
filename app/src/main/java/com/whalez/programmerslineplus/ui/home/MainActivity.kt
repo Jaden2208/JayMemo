@@ -41,17 +41,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // RecyclerView 초기화
-        val layoutManager = LinearLayoutManager(this)
-//        layoutManager.reverseLayout = true
-//        layoutManager.stackFromEnd = true
-        rv_main.layoutManager = layoutManager
-        rv_main.setHasFixedSize(true)
-
         val memoAdapter = MemoAdapter(applicationContext)
-        rv_main.adapter = memoAdapter
+        // RecyclerView 초기화
+        rv_main.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = memoAdapter
+            setHasFixedSize(true)
+        }
 
-        memoViewModel = ViewModelProvider(this).get(MemoViewModel::class.java)
+        memoViewModel = ViewModelProvider(this)[MemoViewModel::class.java]
         memoViewModel.getAll().observe(this,
             Observer<List<Memo>> { memos -> memoAdapter.submitList(memos) })
 
@@ -164,13 +162,7 @@ class MainActivity : AppCompatActivity() {
             val content = data.getStringExtra(EXTRA_CONTENT)!!
             val photos = data.getStringArrayListExtra(EXTRA_PHOTO)!!
             val timestamp = DateTime().millis
-            val memo =
-                Memo(
-                    title,
-                    content,
-                    photos,
-                    timestamp
-                )
+            val memo = Memo(title, content, photos, timestamp)
             memo.id = id
 
             memoViewModel.update(memo)
