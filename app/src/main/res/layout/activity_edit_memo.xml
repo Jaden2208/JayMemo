@@ -75,7 +75,10 @@
                 android:padding="3dp"
                 android:textColor="@color/colorPrimaryDeepDark"
                 android:textSize="22sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:fontFamily="@font/font_cafe24_oneprettynight">
+                <requestFocus/>
+            </EditText>
 
             <View
                 android:id="@+id/line1"
@@ -113,7 +116,8 @@
                 android:importantForAutofill="no"
                 android:padding="3dp"
                 android:textColor="#000"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:fontFamily="@font/font_cafe24_oneprettynight"/>
 
             <Button
                 android:id="@+id/btn_save"

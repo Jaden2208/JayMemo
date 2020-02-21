@@ -17,8 +17,12 @@ fun isDoubleClicked(): Boolean {
     return false
 }
 
-fun showToast(context: Context, message: String){
+fun shortToast(context: Context, message: String){
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+}
+
+fun longToast(context: Context, message: String){
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 }
 
 fun isInternetAvailable(context: Context): Boolean {

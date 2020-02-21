@@ -27,7 +27,7 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TIMESTAMP
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.isDoubleClicked
-import com.whalez.programmerslineplus.utils.showToast
+import com.whalez.programmerslineplus.utils.shortToast
 import kotlinx.android.synthetic.main.activity_main.*
 import org.joda.time.DateTime
 
@@ -67,13 +67,13 @@ class MainActivity : AppCompatActivity() {
                     builder.setMessage("모든 메모를 삭제하시겠습니까?")
                         .setPositiveButton("예") { _, _ ->
                             memoViewModel.deleteAll()
-                            showToast(this, "모든 메모가 삭제되었습니다.")
+                            shortToast(this, "모든 메모가 삭제되었습니다.")
                         }
                         .setNegativeButton("아니요") { _, _ -> }
                         .show()
                 }
                 APP_INFO -> {
-                    showToast(this, item.title)
+                    shortToast(this, item.title)
                 }
 
             }
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
                     .setCancelable(false)
                     .setPositiveButton("예") { _, _ ->
                         memoViewModel.delete(memoAdapter.getMemoAt(viewHolder.adapterPosition))
-                        showToast(this@MainActivity, "삭제되었습니다.")
+                        shortToast(this@MainActivity, "삭제되었습니다.")
                     }
                     .setNegativeButton("아니요") { _, _ ->
                         memoAdapter.notifyDataSetChanged()
@@ -149,12 +149,12 @@ class MainActivity : AppCompatActivity() {
                 )
 
             memoViewModel.insert(memo)
-            showToast(this, "메모 저장완료")
+            shortToast(this, "메모 저장완료")
 
         } else if (requestCode == EDIT_MEMO_REQUEST && resultCode == RESULT_OK) {
             val id = data!!.getIntExtra(EXTRA_ID, -1)
             if (id == -1) {
-                showToast(this, "메모가 수정되지 않았습니다!")
+                shortToast(this, "메모가 수정되지 않았습니다!")
                 return
             }
 
@@ -166,9 +166,9 @@ class MainActivity : AppCompatActivity() {
             memo.id = id
 
             memoViewModel.update(memo)
-            showToast(this, "메모가 수정되었습니다.")
+            shortToast(this, "메모가 수정되었습니다.")
         } else {
-            showToast(this, "새 메모가 저장되지 않았습니다!")
+            shortToast(this, "새 메모가 저장되지 않았습니다!")
         }
     }
 }

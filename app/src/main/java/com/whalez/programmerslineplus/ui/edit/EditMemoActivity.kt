@@ -13,13 +13,13 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
@@ -43,7 +43,8 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TIMESTAM
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import com.whalez.programmerslineplus.utils.isInternetAvailable
-import com.whalez.programmerslineplus.utils.showToast
+import com.whalez.programmerslineplus.utils.longToast
+import com.whalez.programmerslineplus.utils.shortToast
 import kotlinx.android.synthetic.main.activity_edit_memo.*
 import kotlinx.android.synthetic.main.activity_edit_memo.progressbar_layout
 import kotlinx.coroutines.Dispatchers
@@ -97,6 +98,14 @@ class EditMemoActivity : AppCompatActivity() {
             }
         }
 
+        et_title.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
+            if((event!!.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                et_content.requestFocus()
+                return@OnKeyListener true
+            }
+            false
+        })
+
         // RecyclerView 초기화
         rv_photo.apply {
             val photoLayoutManager = LinearLayoutManager(applicationContext)
@@ -110,27 +119,28 @@ class EditMemoActivity : AppCompatActivity() {
 
         // 사진 추가 버튼
         btn_add_photo.setOnClickListener { imgLoadOptionsMenu.showAsAnchorCenter(it) }
-        imgLoadOptionsMenu.setOnMenuItemClickListener { position, item ->
+        imgLoadOptionsMenu.setOnMenuItemClickListener { position, _ ->
             when (position) {
                 FROM_CAMERA -> {
                     if (permissionChecked) {
                         takePicture()
                     } else {
-                        showToast(this, resources.getString(R.string.permission_require_msg))
+                        shortToast(this, resources.getString(R.string.permission_require_msg))
                     }
                 }
                 FROM_ALBUM -> {
                     if (permissionChecked) {
                         getPictureFromGallery()
                     } else {
-                        showToast(this, resources.getString(R.string.permission_require_msg))
+                        shortToast(this, resources.getString(R.string.permission_require_msg))
                     }
                 }
                 FROM_URL -> {
                     // URL 입력을 위한 다이얼로그 띄움
                     val builder = AlertDialog.Builder(this).create()
+                    val nullParent = null
                     val dialogView = layoutInflater
-                        .inflate(R.layout.input_img_url_layout, null)
+                        .inflate(R.layout.input_img_url_layout, nullParent)
                     var imageUri: Uri? = null
 
                     val btnCancel = dialogView.findViewById<ImageButton>(R.id.btn_cancel)
@@ -148,18 +158,23 @@ class EditMemoActivity : AppCompatActivity() {
                     btnDownloadImg.setOnClickListener {
                         val imageUrl = etUrl.text.toString().trim()
                         if (imageUrl.isEmpty()) {
-                            showToast(this, "링크를 입력해주세요!")
+                            shortToast(this, "링크를 입력해주세요!")
                             return@setOnClickListener
                         }
                         if (!isInternetAvailable(this)) {
-                            showToast(this, "인터넷 연결 상태를 확인해주세요!")
+                            shortToast(this, "인터넷 연결 상태를 확인해주세요!")
                             return@setOnClickListener
                         }
 
                         val circularProgressDrawable = CircularProgressDrawable(this)
-                        circularProgressDrawable.strokeWidth = 5f
-                        circularProgressDrawable.centerRadius = 30f
-                        circularProgressDrawable.start()
+                        circularProgressDrawable.apply {
+                            strokeWidth = 5f
+                            centerRadius = 30f
+                            start()
+                        }
+//                        circularProgressDrawable.strokeWidth = 5f
+//                        circularProgressDrawable.centerRadius = 30f
+//                        circularProgressDrawable.start()
 
                         Glide.with(this)
                             .load(imageUrl)
@@ -172,8 +187,10 @@ class EditMemoActivity : AppCompatActivity() {
                                     target: Target<Drawable>?,
                                     isFirstResource: Boolean
                                 ): Boolean {
-                                    showToast(this@EditMemoActivity,
-                                        "이미지를 로드할 수 없습니다. URL 주소 또는 인터넷 연결 상태를 확인해주세요.")
+                                    shortToast(
+                                        this@EditMemoActivity,
+                                        "이미지를 로드할 수 없습니다. URL 주소 또는 인터넷 연결 상태를 확인해주세요."
+                                    )
                                     imageUri = null
                                     return false
                                 }
@@ -194,7 +211,7 @@ class EditMemoActivity : AppCompatActivity() {
                     // 추가하기 버튼 클릭
                     btnAddUrlImg.setOnClickListener {
                         if (imageUri == null) {
-                            showToast(this, "추가할 사진이 없습니다.")
+                            shortToast(this, "추가할 사진이 없습니다.")
                             return@setOnClickListener
                         }
                         photoList.add(imageUri!!)
@@ -217,13 +234,13 @@ class EditMemoActivity : AppCompatActivity() {
             val title = et_title.text.toString().trim()
             val content = et_content.text.toString().trim()
             if (title.isEmpty() && content.isEmpty() && photoList.isEmpty()) {
-                showToast(this, "저장할 내용이 없습니다!")
+                shortToast(this, "저장할 내용이 없습니다!")
                 return@setOnClickListener
             }
 
-            if(mode == EDIT_MODE){
-                if(originalTitle == title && originalContent == content && originalImageUri == photoList){
-                    showToast(this, "변경된 사항이 없습니다.")
+            if (mode == EDIT_MODE) {
+                if (originalTitle == title && originalContent == content && originalImageUri == photoList) {
+                    shortToast(this, "변경된 사항이 없습니다.")
                     return@setOnClickListener
                 }
             }
@@ -235,28 +252,33 @@ class EditMemoActivity : AppCompatActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 for (photoUri in photoList) {
                     val bitmap =
-                        if (photoUri.toString().substring(0, 4) == "http") {
-                            if(!isInternetAvailable(this@EditMemoActivity)){
+                        if (photoUri.toString().substring(0, 4) != "http") {
+                            if (Build.VERSION.SDK_INT < 28) {
+                                MediaStore.Images.Media.getBitmap(
+                                    this@EditMemoActivity.contentResolver, photoUri
+                                )
+                            } else {
+                                val source = ImageDecoder.createSource(
+                                    this@EditMemoActivity.contentResolver, photoUri
+                                )
+                                ImageDecoder.decodeBitmap(source)
+                            }
+                        } else {
+                            if (!isInternetAvailable(this@EditMemoActivity)) {
                                 lifecycleScope.launch(Dispatchers.Main) {
-                                    showToast(this@EditMemoActivity,
+                                    longToast(
+                                        this@EditMemoActivity,
                                         "첨부된 사진 중에 URL을 통해 받아오는 사진이 있습니다.\n" +
-                                                "인터넷 연결 상태를 확인해주세요.")
+                                                "인터넷 연결 상태를 확인해주세요."
+                                    )
                                     stopSaveProgress()
                                 }
                                 photos.clear()
                                 return@launch
                             }
                             BitmapFactory.decodeStream(
-                                URL(photoUri.toString()).content as InputStream)
-                        } else if (Build.VERSION.SDK_INT < 28) {
-                            MediaStore.Images.Media.getBitmap(
-                                this@EditMemoActivity.contentResolver, photoUri
+                                URL(photoUri.toString()).content as InputStream
                             )
-                        } else {
-                            val source = ImageDecoder.createSource(
-                                this@EditMemoActivity.contentResolver, photoUri
-                            )
-                            ImageDecoder.decodeBitmap(source)
                         }
 
                     val imgName = UUID.randomUUID().toString()
@@ -283,7 +305,7 @@ class EditMemoActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode != Activity.RESULT_OK) {
-            showToast(this, "취소 되었습니다.")
+            shortToast(this, "취소 되었습니다.")
             return
         }
         when (requestCode) {

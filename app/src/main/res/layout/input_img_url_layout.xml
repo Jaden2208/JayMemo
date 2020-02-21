@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginStart="10dp"
+    android:layout_marginStart="5dp"
     android:layout_marginTop="80dp"
-    android:layout_marginEnd="10dp"
+    android:layout_marginEnd="5dp"
     android:layout_marginBottom="80dp"
     android:padding="8dp">
 
@@ -43,7 +43,8 @@
             android:background="@android:drawable/editbox_background"
             android:inputType="textUri"
             android:layout_toStartOf="@+id/btn_download_img"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:hint="이미지 링크 입력" />
 
         <ImageButton
             android:id="@+id/btn_download_img"
