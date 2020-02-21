@@ -17,10 +17,11 @@ import kotlinx.android.synthetic.main.memo_item.view.*
 import org.joda.time.DateTime
 import java.io.File
 
-class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.MemoHolder>(
-    DiffCallback()
-) {
+class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapter.MemoHolder>() {
+
+    private var memos: List<Memo> = ArrayList()
     private lateinit var listener: OnItemClickListener
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemoHolder {
         val inflate = LayoutInflater.from(parent.context)
             .inflate(R.layout.memo_item, parent, false)
@@ -28,7 +29,7 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
     }
 
     override fun onBindViewHolder(holder: MemoHolder, position: Int) {
-        val currentMemo = getItem(position)
+        val currentMemo = memos[position]
         holder.title.text = currentMemo.title
         holder.content.text = currentMemo.content
         holder.timestamp.text = DateTime(currentMemo.timestamp).toString("yyyy년 MM월 dd일 HH:mm:ss")
@@ -46,7 +47,12 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
     }
 
     fun getMemoAt(position: Int): Memo {
-        return getItem(position)
+        return memos[position]
+    }
+
+    fun setMemos(memos: List<Memo>) {
+        this.memos = memos
+        notifyDataSetChanged()
     }
 
     inner class MemoHolder(
@@ -58,32 +64,20 @@ class MemoAdapter(private val context: Context) : ListAdapter<Memo, MemoAdapter.
         val timestamp: TextView = itemView.tv_timestamp
         init {
             itemView.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    listener.onItemClick(getItem(position))
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    listener.onItemClick(memos[adapterPosition], itemView)
                 }
             }
         }
     }
 
     interface OnItemClickListener {
-        fun onItemClick(memo: Memo)
+        fun onItemClick(memo: Memo, view: View)
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         this.listener = listener
     }
-}
 
-class DiffCallback : DiffUtil.ItemCallback<Memo>() {
-    override fun areItemsTheSame(oldItem: Memo, newItem: Memo): Boolean {
-        // recyclerview 범위를 초과 했을 때 diffcallback이 먹지 않아 임시로 false 처리
-        return false
-//        return oldItem.id == newItem.id
-    }
-
-    override fun areContentsTheSame(oldItem: Memo, newItem: Memo): Boolean {
-        return oldItem == newItem
-    }
-
+    override fun getItemCount(): Int = memos.size
 }

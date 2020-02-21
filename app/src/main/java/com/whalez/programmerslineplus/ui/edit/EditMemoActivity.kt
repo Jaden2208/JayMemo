@@ -216,7 +216,6 @@ class EditMemoActivity : AppCompatActivity() {
                         }
                         photoList.add(imageUri!!)
                         photoAdapter.notifyItemInserted(position)
-//                        photoAdapter.notifyDataSetChanged()
                         builder.dismiss()
                     }
                     builder.setView(dialogView)
@@ -315,7 +314,6 @@ class EditMemoActivity : AppCompatActivity() {
                 val lastPosition = photoList.size - 1
                 photoAdapter.notifyItemInserted(lastPosition)
                 rv_photo.smoothScrollToPosition(lastPosition)
-//                photoAdapter.notifyDataSetChanged()
                 photoFileFromCamera = null
             }
             FROM_ALBUM -> {
@@ -323,7 +321,6 @@ class EditMemoActivity : AppCompatActivity() {
                 val lastPosition = photoList.size - 1
                 photoAdapter.notifyItemInserted(lastPosition)
                 rv_photo.smoothScrollToPosition(lastPosition)
-//                photoAdapter.notifyDataSetChanged()
             }
         }
     }

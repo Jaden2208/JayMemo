@@ -104,7 +104,8 @@
                 app:sliderIndicatorSelectedColor="#5A5A5A"
                 app:sliderIndicatorUnselectedColor="#FFF"
                 app:sliderScrollTimeInSec="1"
-                app:sliderStartAutoCycle="false" />
+                app:sliderStartAutoCycle="false"
+                android:transitionName="@string/transition_to_detail_img"/>
 
         </androidx.cardview.widget.CardView>
 

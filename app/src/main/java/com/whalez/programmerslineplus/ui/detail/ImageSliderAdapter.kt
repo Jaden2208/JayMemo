@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.image_slider_item.view.*
 class ImageSliderAdapter : SliderViewAdapter<ImageSliderAdapter.SliderAdapterVH>() {
 
     private var sliderItems = ArrayList<Uri>()
+    lateinit var itemClick: ItemClick
 
     override fun onCreateViewHolder(parent: ViewGroup): SliderAdapterVH {
         val inflate: View = LayoutInflater.from(parent.context)
@@ -28,6 +29,9 @@ class ImageSliderAdapter : SliderViewAdapter<ImageSliderAdapter.SliderAdapterVH>
          Glide.with(viewHolder.itemView)
              .load(sliderItem)
              .into(viewHolder.imageView)
+        viewHolder.imageView.setOnClickListener {
+            itemClick.onClick(it, position)
+        }
     }
 
     override fun getCount(): Int { //slider view count could be dynamic size
@@ -39,22 +43,13 @@ class ImageSliderAdapter : SliderViewAdapter<ImageSliderAdapter.SliderAdapterVH>
         notifyDataSetChanged()
     }
 
-//    fun deleteItem(position: Int) {
-//        this.sliderItems.removeAt(position)
-//        notifyDataSetChanged()
-//    }
-//
-//    fun addItem(sliderItem: Uri){
-//        this.sliderItems.add(sliderItem)
-//        notifyDataSetChanged()
-//    }
-//
-//    fun getAllItems() = sliderItems
-
+    interface ItemClick {
+        fun onClick(view: View, position: Int)
+    }
 
     inner class SliderAdapterVH(val itemView: View) :
         SliderViewAdapter.ViewHolder(itemView) {
-        var imageView: ImageView = itemView.iv_auto_image_slider
+        var imageView: ImageView = itemView.iv_image_slider_item
     }
 
 }

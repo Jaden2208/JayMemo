@@ -11,6 +11,13 @@
         <item name="android:textViewStyle">@style/TextViewStyle</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
         <item name="android:editTextStyle">@style/EditTextStyle</item>
+
+        <!-- enable window content transitions -->
+        <item name="android:windowContentTransitions">true</item>
+        <!--        <item name="android:windowSharedElementEnterTransition">item_trans.xml</item>-->
+        <!--        // 액티비티 이동 시 입장 애니메이션-->
+        <!--        <item name="android:windowSharedElementExitTransition">item_trans.xml</item>-->
+        <!--        // 액티비티 이동 시 퇴장 애니메이션-->
     </style>
 
     <!-- MyAlertDialogStyle -->

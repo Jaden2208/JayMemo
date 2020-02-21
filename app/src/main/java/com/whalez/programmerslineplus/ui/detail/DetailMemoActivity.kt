@@ -1,11 +1,19 @@
 package com.whalez.programmerslineplus.ui.detail
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.smarteist.autoimageslider.IndicatorAnimations
 import com.smarteist.autoimageslider.SliderAnimations
 import com.whalez.programmerslineplus.R
@@ -16,9 +24,13 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TIMESTAMP
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
+import com.whalez.programmerslineplus.utils.shortToast
 import kotlinx.android.synthetic.main.activity_detail_memo.*
 import kotlinx.android.synthetic.main.activity_detail_memo.tv_content
 import kotlinx.android.synthetic.main.activity_detail_memo.tv_title
+import kotlinx.android.synthetic.main.activity_full_screen_photo.*
+import kotlinx.android.synthetic.main.image_slider_item.*
+import kotlinx.android.synthetic.main.image_slider_item.view.*
 import org.joda.time.DateTime
 import java.io.File
 import kotlin.collections.ArrayList
@@ -49,12 +61,38 @@ class DetailMemoActivity : AppCompatActivity() {
             photoList.add(imgUri)
         }
 
-        // imgSlider 초기화
+        // imgSliderAdapter 초기화
         val imgSliderAdapter = ImageSliderAdapter()
-        imgSliderAdapter.renewItems(photoList)
-        imageSlider.sliderAdapter = imgSliderAdapter
-        imageSlider.setIndicatorAnimation(IndicatorAnimations.SLIDE)
-        imageSlider.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION)
+        imgSliderAdapter.apply {
+            renewItems(photoList)
+            itemClick = object: ImageSliderAdapter.ItemClick {
+                override fun onClick(view: View, position: Int) {
+                    val imageSliderItem = view.findViewById<ImageView>(R.id.iv_image_slider_item)
+                    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        this@DetailMemoActivity, imageSliderItem, imageSliderItem.transitionName)
+                    val intent = Intent(this@DetailMemoActivity, FullScreenPhotoActivity::class.java)
+                    intent.putExtra("IMAGE_NAME", imgNames[position])
+                    startActivity(intent, options.toBundle())
+                }
+
+            }
+        }
+//        imgSliderAdapter.itemClick = object: ImageSliderAdapter.ItemClick {
+//            override fun onClick(view: View, position: Int) {
+//                val intent = Intent(this@DetailMemoActivity, FullScreenPhotoActivity::class.java)
+//                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+//                    this@DetailMemoActivity, view, view.transitionName)
+//                startActivity(intent, options.toBundle())
+//            }
+//
+//        }
+
+        // imgSlider 초기화
+        imageSlider.apply {
+            sliderAdapter = imgSliderAdapter
+            setIndicatorAnimation(IndicatorAnimations.SLIDE)
+            setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION)
+        }
 
         // 수정 버튼 클릭
         btn_edit.setOnClickListener {
@@ -91,5 +129,24 @@ class DetailMemoActivity : AppCompatActivity() {
 
             finish()
         }
+    }
+
+    private fun ImageView.load(uri: Uri, onLoadingFinished: () -> Unit = {}) {
+        val listener = object : RequestListener<Drawable> {
+            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                onLoadingFinished()
+                return false
+            }
+
+            override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                onLoadingFinished()
+                return false
+            }
+        }
+
+        Glide.with(this)
+            .load(uri)
+            .listener(listener)
+            .into(this)
     }
 }

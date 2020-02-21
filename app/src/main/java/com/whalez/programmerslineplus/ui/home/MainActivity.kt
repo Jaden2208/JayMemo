@@ -2,9 +2,12 @@ package com.whalez.programmerslineplus.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -51,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         memoViewModel = ViewModelProvider(this)[MemoViewModel::class.java]
         memoViewModel.getAll().observe(this,
-            Observer<List<Memo>> { memos -> memoAdapter.submitList(memos) })
+            Observer<List<Memo>> { memos -> memoAdapter.setMemos(memos) })
 
         // 메뉴 버튼 클릭
         btn_menu.setOnClickListener { mainMenu.showAsDropDown(it) }
@@ -112,8 +115,9 @@ class MainActivity : AppCompatActivity() {
         // 아이템 클릭
         memoAdapter.setOnItemClickListener(object :
             MemoAdapter.OnItemClickListener {
-            override fun onItemClick(memo: Memo) {
+            override fun onItemClick(memo: Memo, view: View) {
                 if(isDoubleClicked()) return
+
                 val intent = Intent(this@MainActivity, DetailMemoActivity::class.java)
                 intent.putExtra(EXTRA_ID, memo.id)
                 intent.putExtra(EXTRA_TITLE, memo.title)
@@ -147,8 +151,9 @@ class MainActivity : AppCompatActivity() {
                     photos,
                     timestamp
                 )
-
+            rv_main.scrollToPosition(0)
             memoViewModel.insert(memo)
+
             shortToast(this, "메모 저장완료")
 
         } else if (requestCode == EDIT_MEMO_REQUEST && resultCode == RESULT_OK) {
@@ -165,6 +170,7 @@ class MainActivity : AppCompatActivity() {
             val memo = Memo(title, content, photos, timestamp)
             memo.id = id
 
+            rv_main.scrollToPosition(0)
             memoViewModel.update(memo)
             shortToast(this, "메모가 수정되었습니다.")
         } else {
