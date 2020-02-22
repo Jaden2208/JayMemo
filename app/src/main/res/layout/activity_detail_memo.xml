@@ -56,7 +56,7 @@
             android:padding="3dp"
             android:text="제목"
             android:textColor="@color/colorPrimaryDeepDark"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -67,7 +67,7 @@
             android:layout_below="@+id/tv_title"
             android:layout_alignParentEnd="true"
             android:text="timestamp"
-            android:textSize="14sp" />
+            android:textSize="13sp" />
 
         <View
             android:id="@+id/line1"
@@ -128,7 +128,7 @@
             android:padding="3dp"
             android:text="내용"
             android:textColor="#000"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
     </RelativeLayout>
 

@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginStart="5dp"
     android:layout_marginTop="5dp"
     android:layout_marginEnd="5dp">
@@ -9,18 +10,26 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:background="@drawable/item_selector">
+        android:background="@drawable/item_selector"
+        android:padding="8dp">
 
-        <ImageView
-            android:id="@+id/iv_thumbnail"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_thumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:scaleType="centerCrop"
-            android:src="@drawable/default_image"
-            android:transitionName="@string/transition_to_detail_img"/>
+            app:cardCornerRadius="5dp">
+
+            <ImageView
+                android:id="@+id/iv_thumbnail"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/default_image"/>
+
+        </androidx.cardview.widget.CardView>
+
 
         <TextView
             android:id="@+id/tv_title"
@@ -28,10 +37,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/iv_thumbnail"
+            android:layout_toEndOf="@id/cv_thumbnail"
+            android:maxLines="1"
             android:text="제목"
             android:textColor="#000"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
@@ -41,19 +51,20 @@
             android:layout_below="@id/tv_title"
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
-            android:layout_toEndOf="@id/iv_thumbnail"
+            android:layout_toEndOf="@id/cv_thumbnail"
             android:maxLines="1"
             android:text="내욘내용내용"
             android:textColor="#000"
-            android:textSize="15sp" />
+            android:textSize="13sp" />
+
         <TextView
             android:id="@+id/tv_timestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_content"
+            android:layout_alignParentEnd="true"
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
-            android:layout_alignParentEnd="true"
             android:maxLines="1"
             android:text="timestamp"
             android:textSize="13sp" />

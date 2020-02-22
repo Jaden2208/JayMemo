@@ -91,7 +91,6 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
                 }
                 if (selectable) {
                     toggleItemSelected(adapterPosition)
-
                 }
             }
         }

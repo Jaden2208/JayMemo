@@ -5,17 +5,20 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.SystemClock
+import android.util.Log
 import android.widget.Toast
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 
 var mLastClickTime: Long = 0
 
-fun isDoubleClicked(): Boolean {
-    if(SystemClock.elapsedRealtime() - mLastClickTime < 1000) {
-        return true
-    }
-    mLastClickTime = SystemClock.elapsedRealtime()
-    return false
-}
+//fun isDoubleClicked(): Boolean {
+//    if(SystemClock.elapsedRealtime() - mLastClickTime < 1000) {
+//        Log.d(TAG, "double clicked")
+//        return true
+//    }
+//    mLastClickTime = SystemClock.elapsedRealtime()
+//    return false
+//}
 
 fun shortToast(context: Context, message: String){
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

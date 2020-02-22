@@ -74,9 +74,10 @@
                 android:importantForAutofill="no"
                 android:padding="3dp"
                 android:textColor="@color/colorPrimaryDeepDark"
-                android:textSize="22sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:fontFamily="@font/font_nanum_goodjob">
+                android:fontFamily="@font/font_nanum_square_acr"
+                android:textCursorDrawable="@drawable/cursor_primary">
                 <requestFocus/>
             </EditText>
 
@@ -116,8 +117,9 @@
                 android:importantForAutofill="no"
                 android:padding="3dp"
                 android:textColor="#000"
-                android:textSize="18sp"
-                android:fontFamily="@font/font_nanum_goodjob"/>
+                android:textSize="16sp"
+                android:fontFamily="@font/font_nanum_square_acr"
+                android:textCursorDrawable="@drawable/cursor_primary"/>
 
             <Button
                 android:id="@+id/btn_save"

@@ -34,7 +34,7 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TIMESTAMP
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
-import com.whalez.programmerslineplus.utils.isDoubleClicked
+//import com.whalez.programmerslineplus.utils.isDoubleClicked
 import com.whalez.programmerslineplus.utils.shortToast
 import kotlinx.android.synthetic.main.activity_main.*
 import org.joda.time.DateTime
@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         memoAdapter.setOnItemClickListener(object :
             MemoAdapter.OnItemClickListener {
             override fun onItemClick(memo: Memo, view: View) {
-                if(isDoubleClicked()) return
+//                if(isDoubleClicked()) return
 
                 val intent = Intent(this@MainActivity, DetailMemoActivity::class.java)
                 intent.putExtra(EXTRA_ID, memo.id)
@@ -174,7 +174,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         // 메모 추가 버튼 클릭
         btn_add.setOnClickListener {
-            if(isDoubleClicked()) return@setOnClickListener
+//            if(isDoubleClicked()) return@setOnClickListener
             val intent = Intent(this, EditMemoActivity::class.java)
             startActivityForResult(intent, ADD_MEMO_REQUEST)
         }
