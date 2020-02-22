@@ -1,15 +1,23 @@
 package com.whalez.programmerslineplus.ui.home
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.app.ActivityOptionsCompat
+import androidx.databinding.adapters.TextViewBindingAdapter
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,14 +37,18 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_ID
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TIMESTAMP
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import com.whalez.programmerslineplus.utils.isDoubleClicked
 import com.whalez.programmerslineplus.utils.shortToast
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     lateinit var memoViewModel: MemoViewModel
+    lateinit var memoAdapter: MemoAdapter
 
     private val mainMenu by powerMenu(MenuFactory::class)
 
@@ -44,9 +56,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val memoAdapter = MemoAdapter(applicationContext)
         // RecyclerView 초기화
         rv_main.apply {
+            memoAdapter = MemoAdapter(applicationContext)
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = memoAdapter
             setHasFixedSize(true)
@@ -55,6 +67,28 @@ class MainActivity : AppCompatActivity() {
         memoViewModel = ViewModelProvider(this)[MemoViewModel::class.java]
         memoViewModel.getAll().observe(this,
             Observer<List<Memo>> { memos -> memoAdapter.setMemos(memos) })
+
+        btn_search.setOnClickListener {
+            search_bar.visibility = View.VISIBLE
+            app_bar.visibility = View.GONE
+            search_view.isFocusable = true
+            search_view.isIconifiedByDefault = false
+            search_view.requestFocus()
+//            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+
+        }
+        btn_close.setOnClickListener {
+            app_bar.visibility = View.VISIBLE
+            search_bar.visibility = View.GONE
+        }
+
+        search_view.setOnQueryTextListener(this)
+//        search_view.setOnQueryTextFocusChangeListener { v, hasFocus ->
+//            val imm = getSystemService(Context.INPUT_METHOD_SERVICE)
+//            imm.toggle
+//        }
 
         // 메뉴 버튼 클릭
         btn_menu.setOnClickListener { mainMenu.showAsDropDown(it) }
@@ -176,5 +210,15 @@ class MainActivity : AppCompatActivity() {
         } else {
             shortToast(this, "새 메모가 저장되지 않았습니다!")
         }
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        Log.d(TAG, "TEXT CHANGED")
+        memoAdapter.filter.filter(newText)
+        return false
     }
 }

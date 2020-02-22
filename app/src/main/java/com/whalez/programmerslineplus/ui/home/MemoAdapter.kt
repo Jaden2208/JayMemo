@@ -2,9 +2,12 @@ package com.whalez.programmerslineplus.ui.home
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
@@ -13,13 +16,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.whalez.programmerslineplus.R
 import com.whalez.programmerslineplus.room.data.Memo
+import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import kotlinx.android.synthetic.main.memo_item.view.*
 import org.joda.time.DateTime
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
-class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapter.MemoHolder>() {
+class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapter.MemoHolder>(), Filterable {
 
     private var memos: List<Memo> = ArrayList()
+    private var filteredMemos: List<Memo> = ArrayList()
     private lateinit var listener: OnItemClickListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemoHolder {
@@ -29,7 +36,7 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
     }
 
     override fun onBindViewHolder(holder: MemoHolder, position: Int) {
-        val currentMemo = memos[position]
+        val currentMemo = filteredMemos[position]
         holder.title.text = currentMemo.title
         holder.content.text = currentMemo.content
         holder.timestamp.text = DateTime(currentMemo.timestamp).toString("yyyy년 MM월 dd일 HH:mm:ss")
@@ -46,11 +53,14 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
         }
     }
 
+    override fun getItemCount(): Int = filteredMemos.size
+
     fun getMemoAt(position: Int): Memo {
-        return memos[position]
+        return filteredMemos[position]
     }
 
     fun setMemos(memos: List<Memo>) {
+        this.filteredMemos = memos
         this.memos = memos
         notifyDataSetChanged()
     }
@@ -65,7 +75,7 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
         init {
             itemView.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
-                    listener.onItemClick(memos[adapterPosition], itemView)
+                    listener.onItemClick(filteredMemos[adapterPosition], itemView)
                 }
             }
         }
@@ -79,5 +89,37 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
         this.listener = listener
     }
 
-    override fun getItemCount(): Int = memos.size
+    override fun getFilter(): Filter {
+        return object: Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                var searchText = constraint.toString()
+                if(searchText.isEmpty()) {
+                    filteredMemos = memos
+                } else {
+                    val filteringMemos = ArrayList<Memo>()
+                    searchText = searchText.toLowerCase(Locale.getDefault())
+                    Log.d(TAG, "searchText : $searchText")
+                    for(memo in memos){
+                        val title = memo.title.toLowerCase(Locale.getDefault())
+                        val content = memo.content.toLowerCase(Locale.getDefault())
+                        if(title.contains(searchText) || content.contains(searchText)){
+                            filteringMemos.add(memo)
+                        }
+                    }
+                    filteredMemos = filteringMemos
+                }
+                val filterResults = FilterResults()
+                filterResults.values = filteredMemos
+                return filterResults
+            }
+
+            @Suppress("UNCHECKED_CAST")
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                notifyDataSetChanged()
+            }
+
+        }
+    }
+
+
 }

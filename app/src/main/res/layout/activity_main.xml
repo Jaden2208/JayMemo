@@ -7,7 +7,6 @@
     tools:context=".ui.home.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_height">
 
@@ -17,8 +16,49 @@
             app:layout_scrollFlags="scroll|enterAlways">
 
             <RelativeLayout
+                android:id="@+id/search_bar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                android:layout_height="match_parent"
+                android:layout_margin="1dp"
+                android:visibility="gone">
+
+                <SearchView
+                    android:id="@+id/search_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/rectangle_primary"
+                    android:searchIcon="@drawable/ic_search_primary"
+                    android:iconifiedByDefault="false"
+                    android:layout_toStartOf="@+id/btn_close"
+                    android:paddingStart="-5dp"
+                    tools:ignore="RtlSymmetry">
+                </SearchView>
+
+                <ImageButton
+                    android:id="@+id/btn_close"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_up_arrow"
+                    android:background="@android:color/transparent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageButton
+                    android:id="@+id/btn_search"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_search_white"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:background="@android:color/transparent"/>
 
                 <TextView
                     android:id="@+id/tv_title"
