@@ -18,6 +18,9 @@
         <!--        // 액티비티 이동 시 입장 애니메이션-->
         <!--        <item name="android:windowSharedElementExitTransition">item_trans.xml</item>-->
         <!--        // 액티비티 이동 시 퇴장 애니메이션-->
+
+        <!-- enable dismiss Activity by dragging -->
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 
     <!-- MyAlertDialogStyle -->

@@ -87,4 +87,12 @@ dependencies {
     // SwipeRefreshLayout
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
+    // Chrisbanes PhotoView
+    // 출처: https://github.com/chrisbanes/PhotoView
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+
+    // Hauler : create swipe to dismiss Activity
+    // 출처: https://github.com/futuredapp/hauler
+    implementation "com.thefuntasty.hauler:core:3.0.1"
+
 }

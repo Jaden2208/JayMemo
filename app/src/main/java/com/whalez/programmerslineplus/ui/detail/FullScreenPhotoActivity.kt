@@ -15,6 +15,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.thefuntasty.hauler.setOnDragDismissedListener
 import com.whalez.programmerslineplus.R
 import kotlinx.android.synthetic.main.activity_full_screen_photo.*
 import java.io.File
@@ -30,6 +31,10 @@ class FullScreenPhotoActivity : AppCompatActivity() {
         supportPostponeEnterTransition()
         iv_fullscreen.load(imgUri) {
             supportStartPostponedEnterTransition()
+        }
+
+        haulerView.setOnDragDismissedListener {
+            finish()
         }
     }
 
