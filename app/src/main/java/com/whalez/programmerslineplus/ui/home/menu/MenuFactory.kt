@@ -15,12 +15,14 @@ import com.whalez.programmerslineplus.R
 class MenuFactory: PowerMenu.Factory() {
 
     companion object { // 메뉴 옵션
-        const val DELETE_ALL = 0
-        const val APP_INFO = 1
+        const val DELETE_SELECTED = 0
+        const val DELETE_ALL = 1
+        const val APP_INFO = 2
     }
 
     override fun create(context: Context, lifecycle: LifecycleOwner): PowerMenu {
         return createPowerMenu(context) {
+            addItem(PowerMenuItem("선택 삭제", false))
             addItem(PowerMenuItem("모두 삭제", false))
             addItem(PowerMenuItem("앱 정보", false))
             /* PowerMenu methods link

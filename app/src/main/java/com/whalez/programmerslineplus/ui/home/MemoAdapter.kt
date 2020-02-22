@@ -3,6 +3,7 @@ package com.whalez.programmerslineplus.ui.home
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +11,7 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
+import androidx.core.util.keyIterator
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.whalez.programmerslineplus.R
@@ -23,19 +23,23 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapter.MemoHolder>(), Filterable {
+class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapter.MemoViewHolder>()
+    , Filterable {
 
     private var memos: List<Memo> = ArrayList()
     private var filteredMemos: List<Memo> = ArrayList()
     private lateinit var listener: OnItemClickListener
+    var selectable = false
+    private var selectedItems = SparseBooleanArray(0)
+    var selectedItemsIds = ArrayList<Int>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemoHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemoViewHolder {
         val inflate = LayoutInflater.from(parent.context)
             .inflate(R.layout.memo_item, parent, false)
-        return MemoHolder(inflate)
+        return MemoViewHolder(inflate)
     }
 
-    override fun onBindViewHolder(holder: MemoHolder, position: Int) {
+    override fun onBindViewHolder(holder: MemoViewHolder, position: Int) {
         val currentMemo = filteredMemos[position]
         holder.title.text = currentMemo.title
         holder.content.text = currentMemo.content
@@ -51,6 +55,14 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
         } else {
             holder.thumbnail.visibility = View.GONE
         }
+
+        val isMemoSelected = isItemSelected(position)
+        if(isMemoSelected){
+            selectedItemsIds.add(currentMemo.id)
+        } else {
+            selectedItemsIds.remove(currentMemo.id)
+        }
+        holder.itemView.isSelected = isMemoSelected
     }
 
     override fun getItemCount(): Int = filteredMemos.size
@@ -65,7 +77,7 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
         notifyDataSetChanged()
     }
 
-    inner class MemoHolder(
+    inner class MemoViewHolder(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.tv_title
@@ -74,11 +86,35 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
         val timestamp: TextView = itemView.tv_timestamp
         init {
             itemView.setOnClickListener {
-                if (adapterPosition != RecyclerView.NO_POSITION) {
+                if (!selectable && adapterPosition != RecyclerView.NO_POSITION) {
                     listener.onItemClick(filteredMemos[adapterPosition], itemView)
+                }
+                if (selectable) {
+                    toggleItemSelected(adapterPosition)
+
                 }
             }
         }
+    }
+
+    fun toggleItemSelected(position: Int){
+        if(selectedItems.get(position, false)) {
+            selectedItems.delete(position)
+            notifyItemChanged(position)
+        } else {
+            selectedItems.put(position, true)
+            notifyItemChanged(position)
+        }
+    }
+    private fun isItemSelected(position: Int): Boolean {
+        return selectedItems.get(position,false)
+    }
+    fun clearSelectedItems() {
+        for(position in selectedItems.keyIterator()) {
+            selectedItems.put(position, false)
+            notifyItemChanged(position)
+        }
+        selectedItems.clear()
     }
 
     interface OnItemClickListener {

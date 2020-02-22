@@ -45,5 +45,11 @@ class MemoViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
+    fun deleteSelectedMemos(idList: List<Int>){
+        viewModelScope.launch(Dispatchers.IO) {
+            db.memoDao().deleteSelectedMemos(idList)
+        }
+    }
+
 
 }

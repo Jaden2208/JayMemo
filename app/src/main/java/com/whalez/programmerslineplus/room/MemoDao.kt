@@ -21,4 +21,7 @@ interface MemoDao {
 
     @Query("delete from Memo")
     fun deleteAllMemos()
+
+    @Query("delete from Memo where id in (:idList)")
+    fun deleteSelectedMemos(idList: List<Int>)
 }

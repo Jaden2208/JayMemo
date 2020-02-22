@@ -11,9 +11,37 @@
         android:layout_height="@dimen/app_bar_height">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing_bar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|enterAlways">
+
+            <RelativeLayout
+                android:id="@+id/delete_bar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorRed"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="삭제할 메모를 선택해주세요"
+                    android:textColor="#fff"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_centerInParent="true"/>
+
+                <ImageButton
+                    android:id="@+id/btn_cancel_select"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_up_arrow"
+                    android:padding="1dp"/>
+            </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/search_bar"
@@ -26,46 +54,46 @@
                     android:id="@+id/search_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_toStartOf="@+id/btn_close_search_bar"
                     android:background="@drawable/rectangle_primary"
-                    android:searchIcon="@drawable/ic_search_primary"
                     android:iconifiedByDefault="false"
-                    android:layout_toStartOf="@+id/btn_close"
                     android:paddingStart="-5dp"
-                    tools:ignore="RtlSymmetry">
-                </SearchView>
+                    android:searchIcon="@drawable/ic_search_primary"
+                    tools:ignore="RtlSymmetry"/>
 
                 <ImageButton
-                    android:id="@+id/btn_close"
+                    android:id="@+id/btn_close_search_bar"
                     android:layout_width="40dp"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_up_arrow"
-                    android:background="@android:color/transparent"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"/>
+                    android:layout_centerVertical="true"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_up_arrow" />
 
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/app_bar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:visibility="visible">
 
                 <ImageButton
                     android:id="@+id/btn_search"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/ic_search_white"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="8dp"
-                    android:background="@android:color/transparent"/>
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_search_white" />
 
                 <TextView
                     android:id="@+id/tv_title"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_margin="5dp"
                     android:layout_centerInParent="true"
+                    android:layout_margin="5dp"
                     android:gravity="center"
                     android:text="LINE X PROGRAMMERS"
                     android:textColor="#fff"
@@ -92,8 +120,9 @@
         android:id="@+id/rv_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:paddingBottom="5dp"/>
+        android:paddingBottom="5dp"
+        android:background="@color/colorPrimaryWhite"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_add"
@@ -104,5 +133,15 @@
         android:backgroundTint="@color/colorPrimary"
         android:src="@drawable/ic_add_white"
         app:borderWidth="0dp" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="20dp"
+        android:backgroundTint="@color/colorRed"
+        android:src="@drawable/ic_trash"
+        app:borderWidth="0dp"
+        android:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
