@@ -59,7 +59,7 @@
                     android:iconifiedByDefault="false"
                     android:paddingStart="-5dp"
                     android:searchIcon="@drawable/ic_search_primary"
-                    tools:ignore="RtlSymmetry"/>
+                    tools:ignore="RtlSymmetry" />
 
                 <ImageButton
                     android:id="@+id/btn_close_search_bar"

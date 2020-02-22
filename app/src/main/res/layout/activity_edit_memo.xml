@@ -76,7 +76,7 @@
                 android:textColor="@color/colorPrimaryDeepDark"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                android:fontFamily="@font/font_cafe24_oneprettynight">
+                android:fontFamily="@font/font_nanum_goodjob">
                 <requestFocus/>
             </EditText>
 
@@ -117,7 +117,7 @@
                 android:padding="3dp"
                 android:textColor="#000"
                 android:textSize="18sp"
-                android:fontFamily="@font/font_cafe24_oneprettynight"/>
+                android:fontFamily="@font/font_nanum_goodjob"/>
 
             <Button
                 android:id="@+id/btn_save"
