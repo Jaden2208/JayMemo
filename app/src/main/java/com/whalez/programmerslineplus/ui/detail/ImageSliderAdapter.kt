@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.smarteist.autoimageslider.SliderViewAdapter
 import com.whalez.programmerslineplus.R
 import kotlinx.android.synthetic.main.image_slider_item.view.*

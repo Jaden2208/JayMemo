@@ -34,21 +34,21 @@ class DetailMemoActivity : AppCompatActivity() {
 
         val title = intent.getStringExtra(EXTRA_TITLE)
         val content = intent.getStringExtra(EXTRA_CONTENT)
-        val imgNames = intent.getStringArrayListExtra(EXTRA_PHOTO)!!
+        val photos = intent.getStringArrayListExtra(EXTRA_PHOTO)!!
         val timestamp = intent.getLongExtra(EXTRA_TIMESTAMP, -1)
 
         tv_title.text = title
         tv_content.text = content
         tv_detail_timestamp.text = DateTime(timestamp).toString("yyyy년 MM월 dd일 HH:mm:ss")
-        if(imgNames.isEmpty()) {
+        if(photos.isEmpty()) {
             imageSlider.visibility = View.GONE
             val params = line2.layoutParams as RelativeLayout.LayoutParams
             params.addRule(RelativeLayout.BELOW, R.id.line1)
         }
 
         val photoList = ArrayList<Uri>()
-        for(imgName in imgNames) {
-            val imgUri = Uri.fromFile(File("${File(cacheDir.toString())}/${imgName}.jpg"))
+        for(photo in photos) {
+            val imgUri = Uri.parse(photo)
             photoList.add(imgUri)
         }
 
@@ -64,7 +64,7 @@ class DetailMemoActivity : AppCompatActivity() {
                     val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                         this@DetailMemoActivity, imageSliderItem, imageSliderItem.transitionName)
                     val intent = Intent(this@DetailMemoActivity, FullScreenPhotoActivity::class.java)
-                    intent.putExtra("IMAGE_NAME", imgNames[position])
+                    intent.putExtra("IMAGE_NAME", photos[position])
                     startActivity(intent, options.toBundle())
                 }
 
@@ -84,7 +84,7 @@ class DetailMemoActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_ID, intent.getIntExtra(EXTRA_ID, -1))
             intent.putExtra(EXTRA_TITLE, title)
             intent.putExtra(EXTRA_CONTENT, content)
-            intent.putExtra(EXTRA_PHOTO, imgNames)
+            intent.putExtra(EXTRA_PHOTO, photos)
             startActivityForResult(intent, EDIT_MEMO_REQUEST)
         }
 
@@ -114,23 +114,4 @@ class DetailMemoActivity : AppCompatActivity() {
             finish()
         }
     }
-
-//    private fun ImageView.load(uri: Uri, onLoadingFinished: () -> Unit = {}) {
-//        val listener = object : RequestListener<Drawable> {
-//            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-//                onLoadingFinished()
-//                return false
-//            }
-//
-//            override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-//                onLoadingFinished()
-//                return false
-//            }
-//        }
-//
-//        Glide.with(this)
-//            .load(uri)
-//            .listener(listener)
-//            .into(this)
-//    }
 }

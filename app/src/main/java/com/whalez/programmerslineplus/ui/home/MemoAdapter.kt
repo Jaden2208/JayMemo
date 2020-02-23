@@ -1,6 +1,7 @@
 package com.whalez.programmerslineplus.ui.home
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
 import android.util.SparseBooleanArray
@@ -14,6 +15,11 @@ import android.widget.TextView
 import androidx.core.util.keyIterator
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.whalez.programmerslineplus.R
 import com.whalez.programmerslineplus.room.data.Memo
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
@@ -30,7 +36,6 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
     private var filteredMemos: List<Memo> = ArrayList()
     private lateinit var listener: OnItemClickListener
     var selectable = false
-//    private var itemClickable = true
     private var selectedItems = SparseBooleanArray(0)
     var selectedItemsIds = ArrayList<Int>()
 
@@ -46,11 +51,9 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
         holder.content.text = currentMemo.content
         holder.timestamp.text = DateTime(currentMemo.timestamp).toString("yyyy년 MM월 dd일 HH:mm:ss")
         if (currentMemo.photos.size > 0) {
-            val thumbnailName = currentMemo.photos[0]
-            val fileDir = File(context.cacheDir.toString())
-            val imgUri = Uri.fromFile(File("${fileDir}/${thumbnailName}.jpg"))
+            val thumbnail = currentMemo.photos[0]
             Glide.with(holder.thumbnail.context)
-                .load(imgUri)
+                .load(Uri.parse(thumbnail))
                 .into(holder.thumbnail)
             holder.thumbnail.visibility = View.VISIBLE
         } else {
@@ -156,6 +159,25 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
             }
 
         }
+    }
+
+    private fun ImageView.load(uri: Uri, onLoadingFinished: () -> Unit = {}) {
+        val listener = object : RequestListener<Drawable> {
+            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                onLoadingFinished()
+                return false
+            }
+
+            override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                onLoadingFinished()
+                return false
+            }
+        }
+
+        Glide.with(this)
+            .load(uri)
+            .listener(listener)
+            .into(this)
     }
 
 

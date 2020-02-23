@@ -64,8 +64,8 @@ class EditMemoActivity : AppCompatActivity() {
 
     private val imgLoadOptionsMenu by powerMenu(ImageLoadOptionsFactory::class)
 
-    private val photoList = ArrayList<Uri>()
-    private val photoAdapter = PhotoAdapter(photoList)
+    private val photoListString = ArrayList<String>()
+    private val photoAdapter = PhotoAdapter(photoListString)
 
     private var permissionChecked = false
 
@@ -77,24 +77,21 @@ class EditMemoActivity : AppCompatActivity() {
 
         var originalTitle = ""
         var originalContent = ""
-        val originalImage: ArrayList<String>
-        val originalImageUri = ArrayList<Uri>()
+        var originalPhotos = ArrayList<String>()
 
         // 수정버튼을 클릭해서 들어온 경우 intent로 전달받은 텍스트, 이미지 불러오기.
         if (intent.hasExtra(EXTRA_ID)) {
             mode = EDIT_MODE
             originalTitle = intent.getStringExtra(EXTRA_TITLE)!!
             originalContent = intent.getStringExtra(EXTRA_CONTENT)!!
-            originalImage = intent.getStringArrayListExtra(EXTRA_PHOTO)!!
+            originalPhotos = intent.getStringArrayListExtra(EXTRA_PHOTO)!!
             tv_bar_title.visibility = View.GONE
             val params = btn_add_photo.layoutParams as RelativeLayout.LayoutParams
             params.addRule(RelativeLayout.ALIGN_PARENT_END, R.id.rl_appbar)
             et_title.setText(originalTitle)
             et_content.setText(originalContent)
-            for (imgName in originalImage) {
-                val imgUri = Uri.fromFile(File("${File(cacheDir.toString())}/${imgName}.jpg"))
-                photoList.add(imgUri)
-                originalImageUri.add(imgUri)
+            for (photo in originalPhotos) {
+                photoListString.add(photo)
             }
         }
 
@@ -112,7 +109,6 @@ class EditMemoActivity : AppCompatActivity() {
             photoLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
             layoutManager = photoLayoutManager
             adapter = photoAdapter
-//            itemAnimator = DefaultItemAnimator()
         }
 
         callPermissions()
@@ -211,8 +207,9 @@ class EditMemoActivity : AppCompatActivity() {
                             shortToast(this, "추가할 사진이 없습니다.")
                             return@setOnClickListener
                         }
-                        photoList.add(imageUri!!)
+                        photoListString.add(imageUri!!.toString())
                         photoAdapter.notifyItemInserted(position)
+                        rv_photo.scrollToPosition(position)
                         builder.dismiss()
                     }
                     builder.setView(dialogView)
@@ -229,76 +226,34 @@ class EditMemoActivity : AppCompatActivity() {
 
             val title = et_title.text.toString().trim()
             val content = et_content.text.toString().trim()
-            if (title.isEmpty() && content.isEmpty() && photoList.isEmpty()) {
+            if (title.isEmpty() && content.isEmpty() && photoListString.isEmpty()) {
                 shortToast(this, "저장할 내용이 없습니다!")
                 return@setOnClickListener
             }
 
             if (mode == EDIT_MODE) {
-                if (originalTitle == title && originalContent == content && originalImageUri == photoList) {
+                if (originalTitle == title && originalContent == content && originalPhotos == photoListString) {
                     shortToast(this, "변경된 사항이 없습니다.")
                     return@setOnClickListener
                 }
             }
 
-            startSaveProgress()
+//            startSaveProgress()
 
-            val photos = ArrayList<String>()
 
-            Log.d(TAG, "1")
+            intent.putExtra(EXTRA_TITLE, title)
+            intent.putExtra(EXTRA_CONTENT, content)
+            intent.putExtra(EXTRA_PHOTO, photoListString)
+            intent.putExtra(EXTRA_TIMESTAMP, DateTime().millis)
 
-            lifecycleScope.launch(Dispatchers.IO) {
-                for (photoUri in photoList) {
-                    Log.d(TAG, "2")
-                    val bitmap =
-                        if (photoUri.toString().substring(0, 4) != "http") {
-                            if (Build.VERSION.SDK_INT < 28) {
-                                MediaStore.Images.Media.getBitmap(
-                                    this@EditMemoActivity.contentResolver, photoUri
-                                )
-                            } else {
-                                ImageDecoder.decodeBitmap(ImageDecoder.createSource(
-                                    this@EditMemoActivity.contentResolver, photoUri
-                                ))
-                            }
-                        } else {
-                            if (!isInternetAvailable(this@EditMemoActivity)) {
-                                lifecycleScope.launch(Dispatchers.Main) {
-                                    longToast(
-                                        this@EditMemoActivity,
-                                        "첨부된 사진 중에 URL을 통해 받아오는 사진이 있습니다.\n" +
-                                                "인터넷 연결 상태를 확인해주세요."
-                                    )
-                                    stopSaveProgress()
-                                }
-                                photos.clear()
-                                return@launch
-                            }
-                            BitmapFactory.decodeStream(
-                                URL(photoUri.toString()).content as InputStream
-                            )
-                        }
-
-                    val imgName = UUID.randomUUID().toString()
-                    Log.d(TAG, "3")
-                    saveBitmapOnCache(bitmap, imgName)
-                    Log.d(TAG, "4")
-                    photos.add(imgName)
-                }
-
-                intent.putExtra(EXTRA_TITLE, title)
-                intent.putExtra(EXTRA_CONTENT, content)
-                intent.putExtra(EXTRA_PHOTO, photos)
-                intent.putExtra(EXTRA_TIMESTAMP, DateTime().millis)
-
-                val id = intent.getIntExtra(EXTRA_ID, -1)
-                if (id != -1) {
-                    intent.putExtra(EXTRA_ID, id)
-                }
-
-                setResult(RESULT_OK, intent)
-                finish()
+            val id = intent.getIntExtra(EXTRA_ID, -1)
+            if (id != -1) {
+                intent.putExtra(EXTRA_ID, id)
             }
+
+            setResult(RESULT_OK, intent)
+//            stopSaveProgress()
+            finish()
         }
     }
 
@@ -311,15 +266,15 @@ class EditMemoActivity : AppCompatActivity() {
         when (requestCode) {
             FROM_CAMERA -> {
                 val photoUriFromCamera = Uri.fromFile(photoFileFromCamera)
-                photoList.add(photoUriFromCamera)
-                val lastPosition = photoList.size - 1
+                photoListString.add(photoUriFromCamera.toString())
+                val lastPosition = photoListString.size - 1
                 photoAdapter.notifyItemInserted(lastPosition)
                 rv_photo.smoothScrollToPosition(lastPosition)
                 photoFileFromCamera = null
             }
             FROM_ALBUM -> {
-                photoList.add(data!!.data!!)
-                val lastPosition = photoList.size - 1
+                photoListString.add(data!!.data!!.toString())
+                val lastPosition = photoListString.size - 1
                 photoAdapter.notifyItemInserted(lastPosition)
                 rv_photo.smoothScrollToPosition(lastPosition)
             }
@@ -390,22 +345,22 @@ class EditMemoActivity : AppCompatActivity() {
         btn_save.isEnabled = true
     }
 
-    private fun saveBitmapOnCache(bitmap: Bitmap, imgName: String) {
-        // storage에 파일 인스턴스 생성
-        val tempFile = File(cacheDir, "$imgName.jpg")
-        try {
-            // 자동으로 빈 파일 생성
-            tempFile.createNewFile()
-            // 파일을 쓸 수 있는 스트림을 준비
-            val fileOutputStream = FileOutputStream(tempFile)
-            // compress 함수를 사용해 스트림에 비트맵을 저장
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
-            // 스트림 사용후 close
-            fileOutputStream.close()
-        } catch (e: Exception) {
-            Log.d(TAG, "exception: " + e.message)
-        }
-    }
+//    private fun saveBitmapOnCache(bitmap: Bitmap, imgName: String) {
+//        // storage에 파일 인스턴스 생성
+//        val tempFile = File(cacheDir, "$imgName.jpg")
+//        try {
+//            // 자동으로 빈 파일 생성
+//            tempFile.createNewFile()
+//            // 파일을 쓸 수 있는 스트림을 준비
+//            val fileOutputStream = FileOutputStream(tempFile)
+//            // compress 함수를 사용해 스트림에 비트맵을 저장
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
+//            // 스트림 사용후 close
+//            fileOutputStream.close()
+//        } catch (e: Exception) {
+//            Log.d(TAG, "exception: " + e.message)
+//        }
+//    }
 
     private fun callPermissions() {
         val permissionListener = object : PermissionListener {
