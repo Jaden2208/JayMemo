@@ -4,21 +4,35 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.Handler
 import android.os.SystemClock
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.ContextThemeWrapper
+import com.whalez.programmerslineplus.R
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
+
 
 var mLastClickTime: Long = 0
 
-//fun isDoubleClicked(): Boolean {
-//    if(SystemClock.elapsedRealtime() - mLastClickTime < 1000) {
-//        Log.d(TAG, "double clicked")
-//        return true
-//    }
-//    mLastClickTime = SystemClock.elapsedRealtime()
-//    return false
-//}
+fun isDoubleClicked(): Boolean {
+    if(SystemClock.elapsedRealtime() - mLastClickTime < 1000) {
+        Log.d(TAG, "double clicked")
+        return true
+    }
+    mLastClickTime = SystemClock.elapsedRealtime()
+    return false
+}
+
+fun simpleBuilder(context: Context): AlertDialog.Builder {
+    return AlertDialog.Builder(
+        ContextThemeWrapper(
+            context,
+            R.style.MyAlertDialogStyle
+        )
+    )
+}
 
 fun shortToast(context: Context, message: String){
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

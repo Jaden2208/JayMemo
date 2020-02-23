@@ -30,6 +30,7 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
     private var filteredMemos: List<Memo> = ArrayList()
     private lateinit var listener: OnItemClickListener
     var selectable = false
+//    private var itemClickable = true
     private var selectedItems = SparseBooleanArray(0)
     var selectedItemsIds = ArrayList<Int>()
 
@@ -57,7 +58,7 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
         }
 
         val isMemoSelected = isItemSelected(position)
-        if(isMemoSelected){
+        if (isMemoSelected) {
             selectedItemsIds.add(currentMemo.id)
         } else {
             selectedItemsIds.remove(currentMemo.id)
@@ -86,11 +87,12 @@ class MemoAdapter(private val context: Context) : RecyclerView.Adapter<MemoAdapt
         val timestamp: TextView = itemView.tv_timestamp
         init {
             itemView.setOnClickListener {
-                if (!selectable && adapterPosition != RecyclerView.NO_POSITION) {
-                    listener.onItemClick(filteredMemos[adapterPosition], itemView)
-                }
-                if (selectable) {
-                    toggleItemSelected(adapterPosition)
+                if(adapterPosition != RecyclerView.NO_POSITION){
+                    if(!selectable){
+                        listener.onItemClick(filteredMemos[adapterPosition], itemView)
+                    } else {
+                        toggleItemSelected(adapterPosition)
+                    }
                 }
             }
         }

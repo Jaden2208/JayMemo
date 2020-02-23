@@ -7,9 +7,7 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.SearchView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -34,8 +32,10 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_PHOTO
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TIMESTAMP
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
-//import com.whalez.programmerslineplus.utils.isDoubleClicked
+import com.whalez.programmerslineplus.utils.isDoubleClicked
+
 import com.whalez.programmerslineplus.utils.shortToast
+import com.whalez.programmerslineplus.utils.simpleBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import org.joda.time.DateTime
 
@@ -80,38 +80,9 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
                     setSelectMode()
 
 
-                    btn_cancel_select.setOnClickListener {
-                        cancelSelectMode()
-                    }
-
-                    btn_delete.setOnClickListener {
-                        val builder = AlertDialog.Builder(
-                            ContextThemeWrapper(
-                                this@MainActivity,
-                                R.style.MyAlertDialogStyle
-                            )
-                        )
-                        builder.setMessage("선택한 메모를 모두 삭제하시겠습니까?")
-                            .setCancelable(false)
-                            .setPositiveButton("예") { _, _ ->
-                                val idsToDelete = memoAdapter.selectedItemsIds
-                                memoViewModel.deleteSelectedMemos(idsToDelete)
-                                cancelSelectMode()
-                                shortToast(this@MainActivity, "선택된 메모들이 모두 삭제되었습니다.")
-                            }
-                            .setNegativeButton("아니요") { _, _ ->
-                            }
-                            .show()
-
-                    }
                 }
                 DELETE_ALL -> {
-                    val builder = AlertDialog.Builder(
-                        ContextThemeWrapper(
-                            this@MainActivity,
-                            R.style.MyAlertDialogStyle
-                        )
-                    )
+                    val builder = simpleBuilder(this@MainActivity)
                     builder.setMessage("모든 메모를 삭제하시겠습니까?")
                         .setPositiveButton("예") { _, _ ->
                             memoViewModel.deleteAll()
@@ -126,6 +97,26 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             }
         }
 
+        btn_cancel_select.setOnClickListener {
+            cancelSelectMode()
+        }
+
+        btn_delete.setOnClickListener {
+            val builder = simpleBuilder(this@MainActivity)
+            builder.setMessage("선택한 메모를 모두 삭제하시겠습니까?")
+                .setCancelable(false)
+                .setPositiveButton("예") { _, _ ->
+                    val idsToDelete = memoAdapter.selectedItemsIds
+                    memoViewModel.deleteSelectedMemos(idsToDelete)
+                    cancelSelectMode()
+                    shortToast(this@MainActivity, "선택된 메모들이 모두 삭제되었습니다.")
+                }
+                .setNegativeButton("아니요") { _, _ ->
+                }
+                .show()
+
+        }
+
         // 슬라이드를 통한 아이템 삭제
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             override fun onMove(
@@ -137,12 +128,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             }
 
             override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
-                val builder = AlertDialog.Builder(
-                    ContextThemeWrapper(
-                        this@MainActivity,
-                        R.style.MyAlertDialogStyle
-                    )
-                )
+                val builder = simpleBuilder(this@MainActivity)
                 builder.setMessage("정말 삭제하시겠습니까?")
                     .setCancelable(false)
                     .setPositiveButton("예") { _, _ ->
@@ -157,10 +143,10 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         }).attachToRecyclerView(rv_main)
 
         // 아이템 클릭
-        memoAdapter.setOnItemClickListener(object :
-            MemoAdapter.OnItemClickListener {
+        memoAdapter.setOnItemClickListener(object: MemoAdapter.OnItemClickListener {
+
             override fun onItemClick(memo: Memo, view: View) {
-//                if(isDoubleClicked()) return
+                if(isDoubleClicked()) return
 
                 val intent = Intent(this@MainActivity, DetailMemoActivity::class.java)
                 intent.putExtra(EXTRA_ID, memo.id)
@@ -174,11 +160,13 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         // 메모 추가 버튼 클릭
         btn_add.setOnClickListener {
-//            if(isDoubleClicked()) return@setOnClickListener
+            if(isDoubleClicked()) return@setOnClickListener
             val intent = Intent(this, EditMemoActivity::class.java)
             startActivityForResult(intent, ADD_MEMO_REQUEST)
         }
     }
+
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

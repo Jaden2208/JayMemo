@@ -172,9 +172,6 @@ class EditMemoActivity : AppCompatActivity() {
                             centerRadius = 30f
                             start()
                         }
-//                        circularProgressDrawable.strokeWidth = 5f
-//                        circularProgressDrawable.centerRadius = 30f
-//                        circularProgressDrawable.start()
 
                         Glide.with(this)
                             .load(imageUrl)
@@ -248,8 +245,11 @@ class EditMemoActivity : AppCompatActivity() {
 
             val photos = ArrayList<String>()
 
+            Log.d(TAG, "1")
+
             lifecycleScope.launch(Dispatchers.IO) {
                 for (photoUri in photoList) {
+                    Log.d(TAG, "2")
                     val bitmap =
                         if (photoUri.toString().substring(0, 4) != "http") {
                             if (Build.VERSION.SDK_INT < 28) {
@@ -257,10 +257,9 @@ class EditMemoActivity : AppCompatActivity() {
                                     this@EditMemoActivity.contentResolver, photoUri
                                 )
                             } else {
-                                val source = ImageDecoder.createSource(
+                                ImageDecoder.decodeBitmap(ImageDecoder.createSource(
                                     this@EditMemoActivity.contentResolver, photoUri
-                                )
-                                ImageDecoder.decodeBitmap(source)
+                                ))
                             }
                         } else {
                             if (!isInternetAvailable(this@EditMemoActivity)) {
@@ -281,7 +280,9 @@ class EditMemoActivity : AppCompatActivity() {
                         }
 
                     val imgName = UUID.randomUUID().toString()
+                    Log.d(TAG, "3")
                     saveBitmapOnCache(bitmap, imgName)
+                    Log.d(TAG, "4")
                     photos.add(imgName)
                 }
 

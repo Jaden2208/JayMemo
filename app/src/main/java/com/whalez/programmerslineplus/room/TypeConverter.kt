@@ -3,7 +3,6 @@ package com.whalez.programmerslineplus.room
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.util.*
 import kotlin.collections.ArrayList
 
 
@@ -23,18 +22,6 @@ class TypeConverter {
             val gson = Gson()
             return gson.toJson(list)
         }
-
-//        @TypeConverter
-//        @JvmStatic
-//        fun fromTimestamp(value: Long): Date {
-//            return Date(value)
-//        }
-//
-//        @TypeConverter
-//        @JvmStatic
-//        fun dateToTimestamp(date: Date): Long {
-//            return date.time
-//        }
     }
 
 }
