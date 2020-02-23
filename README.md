@@ -31,3 +31,8 @@
    - 외부 이미지 주소(URL) (참고: URL로 이미지를 추가하는 경우, 다운로드하여 첨부할 필요는 없습니다.) **( O )**
 3. 편집 시에는 기존에 첨부된 이미지가 나타나며, 이미지를 더 추가하거나 기존 이미지를 삭제할 수 있습니다. **( O )**
 
+
+## Demo
+**try demo on [here](https://appetize.io/app/rpktkyjy0aa57ftahpc29fh5v4?device=nexus5&scale=75&orientation=portrait&osVersion=10.0)!**
+
+실제 기기에서는 잘 동작하는데 데모 링크에서는 첨부한 사진이 보이지 않는 오류가 있음.
