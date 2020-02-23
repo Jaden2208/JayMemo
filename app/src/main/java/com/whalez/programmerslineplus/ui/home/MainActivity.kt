@@ -33,7 +33,6 @@ import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TIMESTAM
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.EXTRA_TITLE
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import com.whalez.programmerslineplus.utils.isDoubleClicked
-
 import com.whalez.programmerslineplus.utils.shortToast
 import com.whalez.programmerslineplus.utils.simpleBuilder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -52,7 +51,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         // RecyclerView 초기화
         rv_main.apply {
-            memoAdapter = MemoAdapter(applicationContext)
+            memoAdapter = MemoAdapter()
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = memoAdapter
             setHasFixedSize(true)
@@ -74,12 +73,10 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         // 메뉴 버튼 클릭
         btn_menu.setOnClickListener { mainMenu.showAsDropDown(it) }
-        mainMenu.setOnMenuItemClickListener { position, item ->
+        mainMenu.setOnMenuItemClickListener { position, _ ->
             when (position) {
                 DELETE_SELECTED -> {
                     setSelectMode()
-
-
                 }
                 DELETE_ALL -> {
                     val builder = simpleBuilder(this@MainActivity)
@@ -92,15 +89,17 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
                         .show()
                 }
                 APP_INFO -> {
-                    shortToast(this, item.title)
+                    shortToast(this, "사랑합니다 LINE :)")
                 }
             }
         }
 
+        // 선택 삭제 취소 버튼 클릭
         btn_cancel_select.setOnClickListener {
             cancelSelectMode()
         }
 
+        // 삭제 버튼 클릭
         btn_delete.setOnClickListener {
             val builder = simpleBuilder(this@MainActivity)
             builder.setMessage("선택한 메모를 모두 삭제하시겠습니까?")
@@ -144,10 +143,8 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         // 아이템 클릭
         memoAdapter.setOnItemClickListener(object: MemoAdapter.OnItemClickListener {
-
             override fun onItemClick(memo: Memo, view: View) {
                 if(isDoubleClicked()) return
-
                 val intent = Intent(this@MainActivity, DetailMemoActivity::class.java)
                 intent.putExtra(EXTRA_ID, memo.id)
                 intent.putExtra(EXTRA_TITLE, memo.title)
@@ -165,8 +162,6 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             startActivityForResult(intent, ADD_MEMO_REQUEST)
         }
     }
-
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -187,12 +182,20 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             rv_main.scrollToPosition(0)
             memoViewModel.insert(memo)
 
-            shortToast(this, "메모 저장완료")
+            val intent = Intent(this@MainActivity, DetailMemoActivity::class.java)
+            intent.putExtra(EXTRA_ID, memo.id)
+            intent.putExtra(EXTRA_TITLE, memo.title)
+            intent.putExtra(EXTRA_CONTENT, memo.content)
+            intent.putExtra(EXTRA_PHOTO, memo.photos)
+            intent.putExtra(EXTRA_TIMESTAMP, memo.timestamp)
+            startActivityForResult(intent, EDIT_MEMO_REQUEST)
+
+            shortToast(this, "새 메모가 저장되었습니다.")
 
         } else if (requestCode == EDIT_MEMO_REQUEST && resultCode == RESULT_OK) {
             val id = data!!.getIntExtra(EXTRA_ID, -1)
             if (id == -1) {
-                shortToast(this, "메모가 수정되지 않았습니다!")
+                Log.d(TAG, "취소")
                 return
             }
 
@@ -207,7 +210,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             memoViewModel.update(memo)
             shortToast(this, "메모가 수정되었습니다.")
         } else {
-            shortToast(this, "새 메모가 저장되지 않았습니다!")
+            Log.d(TAG, "취소")
         }
     }
 

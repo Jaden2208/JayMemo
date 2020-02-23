@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.view.Gravity
 import androidx.lifecycle.LifecycleOwner
-import com.skydoves.powermenu.CircularEffect
 import com.skydoves.powermenu.MenuAnimation
 import com.skydoves.powermenu.PowerMenu
 import com.skydoves.powermenu.PowerMenuItem
@@ -31,7 +30,6 @@ class MenuFactory: PowerMenu.Factory() {
             setAutoDismiss(true)
             setLifecycleOwner(lifecycle)
             setAnimation(MenuAnimation.SHOWUP_TOP_RIGHT)
-//            setCircularEffect(CircularEffect.BODY)
             setMenuRadius(10f)
             setMenuShadow(10f)
             setTextColorResource(R.color.colorBlack)
@@ -42,7 +40,6 @@ class MenuFactory: PowerMenu.Factory() {
             setMenuColor(Color.WHITE)
             setSelectedMenuColorResource(R.color.colorPrimary)
             setPreferenceName("BasicMenu")
-//            setInitializeRule(Lifecycle.Event.ON_CREATE, 0)
         }
     }
 }

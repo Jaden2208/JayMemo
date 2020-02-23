@@ -23,10 +23,11 @@ import kotlinx.android.synthetic.main.activity_detail_memo.*
 import kotlinx.android.synthetic.main.activity_detail_memo.tv_content
 import kotlinx.android.synthetic.main.activity_detail_memo.tv_title
 import org.joda.time.DateTime
-import java.io.File
 import kotlin.collections.ArrayList
 
 class DetailMemoActivity : AppCompatActivity() {
+
+    private val imgSliderAdapter = ImageSliderAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,8 +53,6 @@ class DetailMemoActivity : AppCompatActivity() {
             photoList.add(imgUri)
         }
 
-        // imgSliderAdapter 초기화
-        val imgSliderAdapter = ImageSliderAdapter()
         imgSliderAdapter.apply {
             renewItems(photoList)
             itemClick = object: ImageSliderAdapter.ItemClick {
@@ -105,6 +104,16 @@ class DetailMemoActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_CONTENT, content)
             intent.putExtra(EXTRA_PHOTO, photos)
             intent.putExtra(EXTRA_TIMESTAMP, timestamp)
+
+            val photoList = ArrayList<Uri>()
+            for(photo in photos) {
+                val imgUri = Uri.parse(photo)
+                photoList.add(imgUri)
+            }
+            imgSliderAdapter.apply {
+                renewItems(photoList)
+            }
+
             val id = intent.getIntExtra(EXTRA_ID, -1)
             if (id != -1) {
                 intent.putExtra(EXTRA_ID, id)

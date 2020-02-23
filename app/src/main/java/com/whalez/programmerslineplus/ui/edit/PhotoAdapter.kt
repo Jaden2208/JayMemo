@@ -1,6 +1,5 @@
 package com.whalez.programmerslineplus.ui.edit
 
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,17 +9,10 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.signature.ObjectKey
 import com.whalez.programmerslineplus.R
 import com.whalez.programmerslineplus.utils.ConstValues.Companion.TAG
 import kotlinx.android.synthetic.main.photo_item.view.*
-import org.joda.time.DateTime
 
 class PhotoAdapter(private val photoList: ArrayList<String>) : RecyclerView.Adapter<PhotoAdapter.PhotoHolder>() {
 

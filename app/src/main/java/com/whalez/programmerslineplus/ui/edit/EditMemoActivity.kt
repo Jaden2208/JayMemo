@@ -3,9 +3,6 @@ package com.whalez.programmerslineplus.ui.edit
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -19,7 +16,6 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
@@ -46,16 +42,9 @@ import com.whalez.programmerslineplus.utils.isInternetAvailable
 import com.whalez.programmerslineplus.utils.longToast
 import com.whalez.programmerslineplus.utils.shortToast
 import kotlinx.android.synthetic.main.activity_edit_memo.*
-import kotlinx.android.synthetic.main.activity_edit_memo.progressbar_layout
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.io.InputStream
-import java.net.URL
-import java.util.*
 import kotlin.collections.ArrayList
 
 class EditMemoActivity : AppCompatActivity() {
@@ -64,8 +53,8 @@ class EditMemoActivity : AppCompatActivity() {
 
     private val imgLoadOptionsMenu by powerMenu(ImageLoadOptionsFactory::class)
 
-    private val photoListString = ArrayList<String>()
-    private val photoAdapter = PhotoAdapter(photoListString)
+    private val photoList = ArrayList<String>()
+    private val photoAdapter = PhotoAdapter(photoList)
 
     private var permissionChecked = false
 
@@ -91,12 +80,12 @@ class EditMemoActivity : AppCompatActivity() {
             et_title.setText(originalTitle)
             et_content.setText(originalContent)
             for (photo in originalPhotos) {
-                photoListString.add(photo)
+                photoList.add(photo)
             }
         }
 
         et_title.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
-            if((event!!.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+            if ((event!!.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 et_content.requestFocus()
                 return@OnKeyListener true
             }
@@ -180,7 +169,7 @@ class EditMemoActivity : AppCompatActivity() {
                                     target: Target<Drawable>?,
                                     isFirstResource: Boolean
                                 ): Boolean {
-                                    shortToast(
+                                    longToast(
                                         this@EditMemoActivity,
                                         "이미지를 로드할 수 없습니다. URL 주소 또는 인터넷 연결 상태를 확인해주세요."
                                     )
@@ -207,7 +196,7 @@ class EditMemoActivity : AppCompatActivity() {
                             shortToast(this, "추가할 사진이 없습니다.")
                             return@setOnClickListener
                         }
-                        photoListString.add(imageUri!!.toString())
+                        photoList.add(imageUri!!.toString())
                         photoAdapter.notifyItemInserted(position)
                         rv_photo.scrollToPosition(position)
                         builder.dismiss()
@@ -226,33 +215,28 @@ class EditMemoActivity : AppCompatActivity() {
 
             val title = et_title.text.toString().trim()
             val content = et_content.text.toString().trim()
-            if (title.isEmpty() && content.isEmpty() && photoListString.isEmpty()) {
+            if (title.isEmpty() && content.isEmpty() && photoList.isEmpty()) {
                 shortToast(this, "저장할 내용이 없습니다!")
                 return@setOnClickListener
             }
 
             if (mode == EDIT_MODE) {
-                if (originalTitle == title && originalContent == content && originalPhotos == photoListString) {
+                if (originalTitle == title && originalContent == content && originalPhotos == photoList) {
                     shortToast(this, "변경된 사항이 없습니다.")
                     return@setOnClickListener
                 }
             }
 
-//            startSaveProgress()
-
-
             intent.putExtra(EXTRA_TITLE, title)
             intent.putExtra(EXTRA_CONTENT, content)
-            intent.putExtra(EXTRA_PHOTO, photoListString)
+            intent.putExtra(EXTRA_PHOTO, photoList)
             intent.putExtra(EXTRA_TIMESTAMP, DateTime().millis)
 
             val id = intent.getIntExtra(EXTRA_ID, -1)
             if (id != -1) {
                 intent.putExtra(EXTRA_ID, id)
             }
-
             setResult(RESULT_OK, intent)
-//            stopSaveProgress()
             finish()
         }
     }
@@ -260,25 +244,23 @@ class EditMemoActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode != Activity.RESULT_OK) {
-            shortToast(this, "취소 되었습니다.")
+            Log.d(TAG, "result not ok in EditMemoActivityResult")
             return
         }
+        val lastPosition = photoList.size
         when (requestCode) {
             FROM_CAMERA -> {
                 val photoUriFromCamera = Uri.fromFile(photoFileFromCamera)
-                photoListString.add(photoUriFromCamera.toString())
-                val lastPosition = photoListString.size - 1
-                photoAdapter.notifyItemInserted(lastPosition)
-                rv_photo.smoothScrollToPosition(lastPosition)
+                photoList.add(photoUriFromCamera.toString())
                 photoFileFromCamera = null
             }
             FROM_ALBUM -> {
-                photoListString.add(data!!.data!!.toString())
-                val lastPosition = photoListString.size - 1
-                photoAdapter.notifyItemInserted(lastPosition)
-                rv_photo.smoothScrollToPosition(lastPosition)
+                val photoUriFromAlbum = data!!.data!!
+                photoList.add(photoUriFromAlbum.toString())
             }
         }
+        photoAdapter.notifyItemInserted(lastPosition)
+        rv_photo.smoothScrollToPosition(lastPosition)
     }
 
     @Throws(IOException::class)
@@ -313,7 +295,6 @@ class EditMemoActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
 
     private fun getPictureFromGallery() {
@@ -321,46 +302,10 @@ class EditMemoActivity : AppCompatActivity() {
             getPictureIntent.setDataAndType(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*"
             ).also {
-                startActivityForResult(getPictureIntent, FROM_ALBUM)
+            startActivityForResult(getPictureIntent, FROM_ALBUM)
             }
         }
     }
-
-    private fun startSaveProgress() {
-        progressbar_layout.visibility = View.VISIBLE
-        progressbar_layout.bringToFront()
-        et_title.isEnabled = false
-        et_content.isEnabled = false
-        btn_add_photo.isEnabled = false
-        btn_back.isEnabled = false
-        btn_save.isEnabled = false
-    }
-
-    private fun stopSaveProgress() {
-        progressbar_layout.visibility = View.GONE
-        et_title.isEnabled = true
-        et_content.isEnabled = true
-        btn_add_photo.isEnabled = true
-        btn_back.isEnabled = true
-        btn_save.isEnabled = true
-    }
-
-//    private fun saveBitmapOnCache(bitmap: Bitmap, imgName: String) {
-//        // storage에 파일 인스턴스 생성
-//        val tempFile = File(cacheDir, "$imgName.jpg")
-//        try {
-//            // 자동으로 빈 파일 생성
-//            tempFile.createNewFile()
-//            // 파일을 쓸 수 있는 스트림을 준비
-//            val fileOutputStream = FileOutputStream(tempFile)
-//            // compress 함수를 사용해 스트림에 비트맵을 저장
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
-//            // 스트림 사용후 close
-//            fileOutputStream.close()
-//        } catch (e: Exception) {
-//            Log.d(TAG, "exception: " + e.message)
-//        }
-//    }
 
     private fun callPermissions() {
         val permissionListener = object : PermissionListener {
